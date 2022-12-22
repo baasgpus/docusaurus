@@ -1,309 +1,161 @@
 ---
+description: How to make your Docusaurus site maximally search-engine-friendly.
+sidebar_label: SEO
 keywords:
-  - algolia
-  - search
+  - seo
+  - positioning
 ---
 
-# Search
+# Search engine optimization (SEO)
 
-There are a few options you can use to add search to your website:
+import BrowserWindow from '@site/src/components/BrowserWindow';
 
-- 🥇 [Algolia DocSearch](#using-algolia-docsearch) (**official**)
-- 👥 [Typesense DocSearch](#using-typesense-docsearch)
-- 👥 [Local Search](#using-local-search)
-- 👥 [Your own `SearchBar` component](#using-your-own-search)
+Docusaurus supports search engine optimization in a variety of ways.
 
-:::info
+## Global metadata {#global-metadata}
 
-🥇 Docusaurus provides **first-class support** for [Algolia DocSearch](#using-algolia-docsearch).
+Provide global meta attributes for the entire site through the [site configuration](./configuration.md#site-metadata). The metadata will all be rendered in the HTML `<head>` using the key-value pairs as the prop name and value.
 
-👥 Other options are **maintained by the community**: please report bugs to their respective repositories.
+```js title="docusaurus.config.js"
+module.exports = {
+  themeConfig: {
+    metadata: [{name: 'keywords', content: 'cooking, blog'}],
+    // This would become <meta name="keywords" content="cooking, blog"> in the generated HTML
+  },
+};
+```
 
-:::
+Docusaurus adds some metadata out-of-the-box. For example, if you have configured [i18n](./i18n/i18n-introduction.md), you will get a [`hreflang`](https://developers.google.com/search/docs/advanced/crawling/localized-versions) alternate link.
 
-## 🥇 Using Algolia DocSearch {#using-algolia-docsearch}
+To read more about types of meta tags, visit [the MDN docs](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/meta).
 
-Docusaurus has **official support** for [Algolia DocSearch](https://docsearch.algolia.com).
+## Single page metadata {#single-page-metadata}
 
-The service is **free** for any open-source project: just make sure to read the [checklist](https://docsearch.algolia.com/docs/who-can-apply/) and [apply to the DocSearch program](https://docsearch.algolia.com/apply).
+Similar to [global metadata](#global-metadata), Docusaurus also allows for the addition of meta-information to individual pages. Follow [this guide](./guides/markdown-features/markdown-features-head-metadata.mdx) for configuring the `<head>` tag. In short:
 
-DocSearch crawls your website once a week (the schedule is configurable from the web interface) and aggregates all the content in an Algolia index. This content is then queried directly from your front-end using the Algolia API.
+```md title="my-markdown-page.md"
+# A cooking guide
 
-If your website is [not eligible](https://docsearch.algolia.com/docs/who-can-apply) for the free, hosted version of DocSearch, or if your website sits behind a firewall and is not public, then you can [run your own](https://docsearch.algolia.com/docs/run-your-own/) DocSearch crawler.
+<head>
+  <meta name="keywords" content="cooking, blog">
+</head>
 
-:::note
+Some content...
+```
 
-By default, the Docusaurus preset generates a [sitemap.xml](https://docusaurus.io/sitemap.xml) that the Algolia crawler can use.
+Docusaurus automatically adds `description`, `title`, canonical URL links, and other useful metadata to each Markdown page. They are configurable through front matter:
 
-:::
+```md
+---
+title: Title for search engines; can be different from the actual heading
+description: A short description of this page
+image: a thumbnail image to be shown in social media cards
+keywords: [keywords, describing, the main topics]
+---
+```
 
-:::info From the old docsearch?
-
-You can read more about migration from the legacy DocSearch infra in [our blog post](/blog/2021/11/21/algolia-docsearch-migration) or [the DocSearch migration docs](https://docsearch.algolia.com/docs/migrating-from-legacy).
-
-:::
-
-### Index Configuration {#algolia-index-configuration}
-
-After your application has been approved and deployed, you will receive an email with all the details for you to add DocSearch to your project. Editing and managing your crawls can be done via [the web interface](https://crawler.algolia.com/). Indices are readily available after deployment, so manual configuration usually isn't necessary.
+When creating your React page, adding these fields in `Layout` would also improve SEO.
 
 :::tip
 
-It is highly recommended to use a config similar to the [**Docusaurus 2 website config**](https://docsearch.algolia.com/docs/templates/#docusaurus-v2-template).
+Prefer to use front matter for fields like `description` and `keywords`: Docusaurus will automatically apply this to both `description` and `og:description`, while you would have to manually declare two metadata tags when using the `<head>` tag.
 
 :::
 
-### Connecting Algolia {#connecting-algolia}
+For JSX pages, you can use the Docusaurus [`<Head>`](docusaurus-core.md#head) component.
 
-Docusaurus' own `@docusaurus/preset-classic` supports Algolia DocSearch integration. If you use the classic preset, no additional installation is needed.
+```jsx title="my-react-page.jsx"
+import React from 'react';
+import Layout from '@theme/Layout';
+import Head from '@docusaurus/Head';
 
-<details>
-<summary>Installation steps when not using <code>@docusaurus/preset-classic</code></summary>
-
-1. Install the package:
-
-```bash npm2yarn
-npm install --save @docusaurus/theme-search-algolia
-```
-
-2. Register the theme in `docusaurus.config.js`:
-
-```js title="docusaurus.config.js"
-module.exports = {
-  title: 'My site',
-  // ...
-  themes: ['@docusaurus/theme-search-algolia'],
-  themeConfig: {
-    // ...
-  },
-};
-```
-
-</details>
-
-Then, add an `algolia` field in your `themeConfig`. **[Apply for DocSearch](https://docsearch.algolia.com/apply/)** to get your Algolia index and API key.
-
-```js title="docusaurus.config.js"
-module.exports = {
-  // ...
-  themeConfig: {
-    // ...
-    // highlight-start
-    algolia: {
-      // The application ID provided by Algolia
-      appId: 'YOUR_APP_ID',
-
-      // Public API key: it is safe to commit it
-      apiKey: 'YOUR_SEARCH_API_KEY',
-
-      indexName: 'YOUR_INDEX_NAME',
-
-      // Optional: see doc section below
-      contextualSearch: true,
-
-      // Optional: Specify domains where the navigation should occur through window.location instead on history.push. Useful when our Algolia config crawls multiple documentation sites and we want to navigate with window.location.href to them.
-      externalUrlRegex: 'external\\.com|domain\\.com',
-
-      // Optional: Algolia search parameters
-      searchParameters: {},
-
-      // Optional: path for search page that enabled by default (`false` to disable it)
-      searchPagePath: 'search',
-
-      //... other Algolia params
-    },
-    // highlight-end
-  },
-};
-```
-
-:::info
-
-The `searchParameters` option used to be named `algoliaOptions` in Docusaurus v1.
-
-Refer to its [official DocSearch documentation](https://docsearch.algolia.com/docs/api#searchparameters) for possible values.
-
-:::
-
-:::caution
-
-The search feature will not work reliably until Algolia crawls your site.
-
-If search doesn't work after any significant change, please use the Algolia dashboard to **trigger a new crawl**.
-
-:::
-
-### Contextual search {#contextual-search}
-
-Contextual search is **enabled by default**.
-
-It ensures that search results are **relevant to the current language and version**.
-
-```js title="docusaurus.config.js"
-module.exports = {
-  // ...
-  themeConfig: {
-    // ...
-    // highlight-start
-    algolia: {
-      contextualSearch: true,
-    },
-    // highlight-end
-  },
-};
-```
-
-Let's consider you have 2 docs versions (**v1** and **v2**) and 2 languages (`en` and `fr`).
-
-When browsing v2 docs, it would be odd to return search results for the v1 documentation. Sometimes v1 and v2 docs are quite similar, and you would end up with duplicate search results for the same query (one result per version).
-
-Similarly, when browsing the French site, it would be odd to return search results for the English docs.
-
-To solve this problem, the contextual search feature understands that you are browsing a specific docs version and language, and will create the search query filters dynamically.
-
-- on `/en/docs/v1/myDoc`, search results will only include **English** results for the **v1** docs (+ other unversioned pages)
-- on `/fr/docs/v2/myDoc`, search results will only include **French** results for the **v2** docs (+ other unversioned pages)
-
-:::info
-
-When using `contextualSearch: true` (default), the contextual facet filters will be merged with the ones provided with `algolia.searchParameters.facetFilters` .
-
-For specific needs, you can disable `contextualSearch` and define your own `facetFilters`:
-
-```js title="docusaurus.config.js"
-module.exports = {
-  // ...
-  themeConfig: {
-    // ...
-    // highlight-start
-    algolia: {
-      contextualSearch: false,
-      searchParameters: {
-        facetFilters: ['language:en', ['filter1', 'filter2'], 'filter3'],
-      },
-    },
-    // highlight-end
-  },
-};
-```
-
-Refer to the relevant [Algolia faceting documentation](https://www.algolia.com/doc/guides/managing-results/refine-results/faceting/).
-
-:::
-
-### Styling your Algolia search {#styling-your-algolia-search}
-
-By default, DocSearch comes with a fine-tuned theme that was designed for accessibility, making sure that colors and contrasts respect standards.
-
-Still, you can reuse the [Infima CSS variables](styling-layout.md#styling-your-site-with-infima) from Docusaurus to style DocSearch by editing the `/src/css/custom.css` file.
-
-```css title="/src/css/custom.css"
-[data-theme='light'] .DocSearch {
-  /* --docsearch-primary-color: var(--ifm-color-primary); */
-  /* --docsearch-text-color: var(--ifm-font-color-base); */
-  --docsearch-muted-color: var(--ifm-color-secondary-darkest);
-  --docsearch-container-background: rgba(94, 100, 112, 0.7);
-  /* Modal */
-  --docsearch-modal-background: var(--ifm-color-secondary-lighter);
-  /* Search box */
-  --docsearch-searchbox-background: var(--ifm-color-secondary);
-  --docsearch-searchbox-focus-background: var(--ifm-color-white);
-  /* Hit */
-  --docsearch-hit-color: var(--ifm-font-color-base);
-  --docsearch-hit-active-color: var(--ifm-color-white);
-  --docsearch-hit-background: var(--ifm-color-white);
-  /* Footer */
-  --docsearch-footer-background: var(--ifm-color-white);
-}
-
-[data-theme='dark'] .DocSearch {
-  --docsearch-text-color: var(--ifm-font-color-base);
-  --docsearch-muted-color: var(--ifm-color-secondary-darkest);
-  --docsearch-container-background: rgba(47, 55, 69, 0.7);
-  /* Modal */
-  --docsearch-modal-background: var(--ifm-background-color);
-  /* Search box */
-  --docsearch-searchbox-background: var(--ifm-background-color);
-  --docsearch-searchbox-focus-background: var(--ifm-color-black);
-  /* Hit */
-  --docsearch-hit-color: var(--ifm-font-color-base);
-  --docsearch-hit-active-color: var(--ifm-color-white);
-  --docsearch-hit-background: var(--ifm-color-emphasis-100);
-  /* Footer */
-  --docsearch-footer-background: var(--ifm-background-surface-color);
-  --docsearch-key-gradient: linear-gradient(
-    -26.5deg,
-    var(--ifm-color-emphasis-200) 0%,
-    var(--ifm-color-emphasis-100) 100%
+export default function page() {
+  return (
+    <Layout title="Page" description="A React page demo">
+      <Head>
+        <meta property="og:image" content="image.png" />
+      </Head>
+      {/* ... */}
+    </Layout>
   );
 }
 ```
 
-### Customizing the Algolia search behavior {#customizing-the-algolia-search-behavior}
+:::tip
 
-<!-- TODO: update options link once the documentation is available on the DocSearch website -->
+For convenience, the default theme `<Layout>` component accept `title` and `description` as props.
 
-Algolia DocSearch supports a [list of options](https://autocomplete-experimental.netlify.app/docs/DocSearchModal#reference) that you can pass to the `algolia` field in the `docusaurus.config.js` file.
+:::
 
-```js title="docusaurus.config.js"
-module.exports = {
-  themeConfig: {
-    // ...
-    algolia: {
-      apiKey: 'YOUR_API_KEY',
-      indexName: 'YOUR_INDEX_NAME',
-      // Options...
-    },
-  },
-};
+## Static HTML generation {#static-html-generation}
+
+Docusaurus is a static site generator—HTML files are statically generated for every URL route, which helps search engines discover your content more easily.
+
+## Image meta description {#image-meta-description}
+
+The alt tag for an image tells the search engine what the image is about, and is used when the image can't be visually seen, e.g. when using a screen reader, or when the image is broken. Alt tags are commonly supported in Markdown.
+
+You may also add a title for your image—this doesn't impact SEO much but is displayed as a tooltip when hovering above the image, usually used to provide hints.
+
+```md
+![Docusaurus banner](./assets/docusaurus-asset-example-banner.png 'Image title')
 ```
 
-### Editing the Algolia search component {#editing-the-algolia-search-component}
+<BrowserWindow>
 
-If you prefer to edit the Algolia search React component, [swizzle](swizzling.md) the `SearchBar` component in `@docusaurus/theme-search-algolia`:
+![Docusaurus banner](./assets/docusaurus-asset-example-banner.png 'Image title')
 
-```bash npm2yarn
-npm run swizzle @docusaurus/theme-search-algolia SearchBar
+</BrowserWindow>
+
+## Rich search information {#rich-search-information}
+
+Docusaurus blogs support [rich search results](https://search.google.com/test/rich-results) out-of-the-box to get maximum search engine experience. The information is created depending on your meta information in blog/global configuration. In order to get the benefits of the rich search information, fill in the information about the post's publish date, authors, and image, etc. Read more about the meta-information [here](./blog.mdx).
+
+## Robots file {#robots-file}
+
+A `robots.txt` file regulates search engines' behavior about which should be displayed and which shouldn't. You can provide it as [static asset](./static-assets.md). The following would allow access to all sub-pages from all requests:
+
+```text title="static/robots.txt"
+User-agent: *
+Disallow:
 ```
 
-### Support {#algolia-support}
+Read more about the robots file in [the Google documentation](https://developers.google.com/search/docs/advanced/robots/intro).
 
-The Algolia DocSearch team can help you figure out search problems on your site.
+:::caution
 
-You can contact them by [email](mailto:documentationsearch@algolia.com) or on [Discord](https://discord.gg/tXdr5mP).
+**Important**: the `robots.txt` file does **not** prevent HTML pages from being indexed.
 
-Docusaurus also has an `#algolia` channel on [Discord](https://discordapp.com/invite/docusaurus).
+To prevent your whole Docusaurus site from being indexed, use the [`noIndex`](./api/docusaurus.config.js.md#noIndex) site config. Some [hosting providers](./deployment.mdx) may also let you configure a `X-Robots-Tag: noindex` HTTP header (GitHub Pages does not support this).
 
-## 👥 Using Typesense DocSearch {#using-typesense-docsearch}
+To prevent a single page from being indexed, use `<meta name="robots" content="noindex">` as [page metadata](#single-page-metadata). Read more about the [robots meta tag](https://developers.google.com/search/docs/advanced/robots/robots_meta_tag).
 
-[Typesense](https://typesense.org) DocSearch works similar to Algolia DocSearch, except that your website is indexed into a Typesense search cluster.
+:::
 
-Typesense is an [open source](https://github.com/typesense/typesense) instant-search engine that you can either:
+## Sitemap file {#sitemap-file}
 
-- [Self-Host](https://typesense.org/docs/latest/guide/install-typesense.html#option-2-local-machine-self-hosting) on your own servers or
-- Use the Managed [Typesense Cloud](https://cloud.typesense.org) service.
+Docusaurus provides the [`@docusaurus/plugin-sitemap`](./api/plugins/plugin-sitemap.md) plugin, which is shipped with `preset-classic` by default. It autogenerates a `sitemap.xml` file which will be available at `https://example.com/[baseUrl]/sitemap.xml` after the production build. This sitemap metadata helps search engine crawlers crawl your site more accurately.
 
-Similar to Algolia DocSearch, there are two components:
+:::tip
 
-- [typesense-docsearch-scraper](https://github.com/typesense/typesense-docsearch-scraper) - which scrapes your website and indexes the data in your Typesense cluster.
-- [docusaurus-theme-search-typesense](https://github.com/typesense/docusaurus-theme-search-typesense) - a search bar UI component to add to your website.
+The sitemap plugin automatically filters pages containing a `noindex` [robots meta directive](https://developers.google.com/search/docs/advanced/robots/robots_meta_tag).
 
-Read a step-by-step walk-through of how to [run typesense-docsearch-scraper here](https://typesense.org/docs/latest/guide/docsearch.html#step-1-set-up-docsearch-scraper) and how to [install the Search Bar in your Docusaurus Site here](https://typesense.org/docs/latest/guide/docsearch.html#option-a-docusaurus-powered-sites).
+For example, [`/examples/noIndex`](/examples/noIndex) is not included in the [Docusaurus sitemap.xml file](pathname:///sitemap.xml) because it contains the following [page metadata](#single-page-metadata):
 
-## 👥 Using Local Search {#using-local-search}
-
-You can use a local search plugin for websites where the search index is small and can be downloaded to your users' browsers when they visit your website.
-
-You'll find a list of community-supported [local search plugins listed here](https://docusaurus.io/community/resources#search).
-
-## 👥 Using your own search {#using-your-own-search}
-
-To use your own search, swizzle the `SearchBar` component in `@docusaurus/theme-classic`
-
-```bash npm2yarn
-npm run swizzle @docusaurus/theme-classic SearchBar
+```html
+<head>
+  <meta name="robots" content="noindex, nofollow" />
+</head>
 ```
 
-This will create an `src/themes/SearchBar` file in your project folder. Restart your dev server and edit the component, you will see that Docusaurus uses your own `SearchBar` component now.
+:::
 
-**Notes**: You can alternatively [swizzle from Algolia SearchBar](#editing-the-algolia-search-component) and create your own search component from there.
+## Human readable links {#human-readable-links}
+
+Docusaurus uses your file names as links, but you can always change that using slugs, see this [tutorial](./guides/docs/docs-introduction.md#document-id) for more details.
+
+## Structured content {#structured-content}
+
+Search engines rely on the HTML markup such as `<h2>`, `<table>`, etc., to understand the structure of your webpage. When Docusaurus renders your pages, semantic markup, e.g. `<aside>`, `<nav>`, `<main>`, are used to divide the different sections of the page, helping the search engine to locate parts like sidebar, navbar, and the main page content.
+
+Most [CommonMark](https://spec.commonmark.org/0.30/#atx-headings) syntaxes have their corresponding HTML tags. By using Markdown consistently in your project, you will make it easier for search engines to understand your page content.

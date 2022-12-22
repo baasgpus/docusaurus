@@ -1,9 +1,10 @@
 ---
+draft: true
 tags:
   - visibility
-  - listed
+  - draft
 ---
 
-# Some Drafts - Listed 1
+# Some Drafts - Draft 1
 
-Regular doc
+Doc with draft front matter

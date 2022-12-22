@@ -1,13 +1,11 @@
 ---
-title: Unlisted blog post
-unlisted: true
+title: Draft blog post
+draft: true
 tags:
   - blog
   - visibility
-  - unlisted
-slug: /unlisted-post
+  - draft
+slug: /draft-post
 ---
 
-This unlisted blog post should be "hidden" in production, but remain accessible.
-
-It is filtered from the sidebar, sitemap, SEO indexation...
+This draft blog post should not be accessible in production, only in dev!

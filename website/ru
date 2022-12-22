@@ -5,13 +5,26 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-.wrappingBlock {
-  width: 50%;
-  display: inline-block;
-  padding: 5px;
-  vertical-align: top;
+.red {
+  color: red;
 }
 
-.wrappingBlock code[class^='codeBlockLines'] {
-  white-space: pre-wrap;
+.red[aria-selected='true'] {
+  border-bottom-color: red;
+}
+
+.orange {
+  color: orange;
+}
+
+.orange[aria-selected='true'] {
+  border-bottom-color: orange;
+}
+
+.yellow {
+  color: yellow;
+}
+
+.yellow[aria-selected='true'] {
+  border-bottom-color: yellow;
 }

@@ -1,67 +1,18 @@
-# title
+---
+test: 'some test front matter'
+---
 
-some text
+# Docusaurus website dogfooding
 
-## section 1
+This is where we test edge cases of Docusaurus by using fancy configs, ensuring they all don't fail during a real site build.
 
-some text
+Eventually, we could move these tests later so another test site? Note there is value to keep seeing the live result of those tests.
 
-### subsection 1-1
+Fancy things we can test for here:
 
-some text
-
-#### subsection 1-1-1
-
-some text
-
-##### subsection 1-1-1-1
-
-some text
-
-###### subsection 1-1-1-1-1
-
-some text
-
-###### subsection 1-1-1-1-2
-
-some text
-
-##### subsection 1-1-1-2
-
-some text
-
-#### subsection 1-1-2
-
-some text
-
-### subsection 1-2
-
-some text
-
-### subsection 1-3
-
-some text
-
-## section 2
-
-some text
-
-### subsection 2-1
-
-some text
-
-### subsection 2-1
-
-some text
-
-## section 3
-
-some text
-
-### subsection 3-1
-
-some text
-
-### subsection 3-2
-
-some text
+- Plugin Multi-instance
+- Webpack configs
+- \_ prefix convention
+- Huge sidebars impact
+- Using folders with spaces on purpose
+- Importing MD docs that are out of content plugin folders as partials (such as this README file!)

@@ -1,52 +1,48 @@
 ---
-slug: /api/misc/@docusaurus/eslint-plugin/no-untranslated-text
+slug: /api/misc/@docusaurus/eslint-plugin/string-literal-i18n-messages
 ---
 
-# no-untranslated-text
+# string-literal-i18n-messages
 
-import APITable from '@site/src/components/APITable';
+Enforce translate APIs to be called on plain text labels.
 
-Enforce text labels in JSX to be wrapped by translate calls.
-
-When the [i18n feature](../../../i18n/i18n-introduction.md) is used, this rule ensures that all labels appearing on the website are translatable, so no string accidentally slips through untranslated.
+Docusaurus offers the [`docusaurus write-translations`](../../../cli.md#docusaurus-write-translations-sitedir) API, which statically extracts the text labels marked as translatable. Dynamic values used in `<Translate>` or `translate()` calls will fail to be extracted. This rule will ensure that all translate calls are statically extractable.
 
 ## Rule Details {#details}
 
 Examples of **incorrect** code for this rule:
 
 ```js
-// Hello World is not translated
-<Component>Hello World</Component>
+const text = 'Some text to be translated'
+
+// Invalid <Translate> child
+<Translate>{text}</Translate>
+
+// Invalid message attribute
+translate({message: text})
 ```
 
 Examples of **correct** code for this rule:
 
 ```js
-// Hello World is translated
-<Component>
-  <Translate>Hello World</Translate>
-</Component>
-```
+// Valid <Translate> child
+<Translate>Some text to be translated</Translate>
 
-## Rule Configuration {#configuration}
+// Valid message attribute
+translate({message: 'Some text to be translated'})
 
-Accepted fields:
+// Valid <Translate> child using values object as prop
+<Translate values={{firstName: 'Sébastien'}}>
+  {'Welcome, {firstName}! How are you?'}
+</Translate>
 
-```mdx-code-block
-<APITable>
-```
-
-| Option           | Type       | Default | Description                                                              |
-| ---------------- | ---------- | ------- | ------------------------------------------------------------------------ |
-| `ignoredStrings` | `string[]` | `[]`    | Text labels that only contain strings in this list will not be reported. |
-
-```mdx-code-block
-</APITable>
+// Valid message attribute using values object as second argument
+translate({message: 'The logo of site {siteName}'}, {siteName: 'Docusaurus'})
 ```
 
 ## When Not To Use It {#when-not-to-use}
 
-If you're not using the [i18n feature](../../../i18n/i18n-introduction.md), you can disable this rule. You can also disable this rule where the text is not supposed to be translated.
+If you're not using the [i18n feature](../../../i18n/i18n-introduction.md), you can disable this rule.
 
 ## Further Reading {#further-reading}
 

@@ -1,58 +1,73 @@
 ---
-sidebar_position: 0
-slug: /api/misc/create-docusaurus
+sidebar_position: 1
+slug: /api/misc/@docusaurus/eslint-plugin
 ---
 
-# 📦 create-docusaurus
+# 📦 eslint-plugin
 
-A scaffolding utility to help you instantly set up a functional Docusaurus app.
+[ESLint](https://eslint.org/) is a tool that statically analyzes your code and reports problems or suggests best practices through editor hints and command line. Docusaurus provides an ESLint plugin to enforce best Docusaurus practices.
 
-## Usage {#usage}
+## Installation
 
-```bash
-npx create-docusaurus@latest [name] [template] [rootDir]
+```bash npm2yarn
+npm install --save-dev @docusaurus/eslint-plugin
 ```
 
-The `name` argument will be used as the site's path as well as the `name` field in the created app's package.json. It can be an absolute path, or a path relative to `rootDir`.
+## Usage
 
-The `template` argument can be one of the following:
+### Recommended config
 
-- `classic`: Uses the classic template (recommended)
-- `facebook`: Uses the Facebook/Meta template, which contains some Meta-specific setup
-- A git repo URL (beginning with `https://` or `git@`), which can be cloned to the destination
-- A local file path relative to CWD, which contains the files to be copied to destination
+Add `plugin:@docusaurus/recommended` to the `extends` section of your `.eslintrc` configuration file:
 
-The `rootDir` will be used to resolve the absolute path to the site directory. The default is CWD.
+```json title=".eslintrc"
+{
+  "extends": ["plugin:@docusaurus/recommended"]
+}
+```
 
-:::caution
+This will enable the `@docusaurus` eslint plugin and use the `recommended` config. See [Supported rules](#supported-rules) below for a list of rules that this will enable.
 
-This command should be preferably used in an interactive shell so all features are available.
+### Manual config
 
-:::
+For more fine-grained control, you can also enable the plugin manually and configure the rules you want to use directly:
 
-## Options {#options}
+```json title=".eslintrc"
+{
+  "plugins": ["@docusaurus"],
+  "rules": {
+    "@docusaurus/string-literal-i18n-messages": "error",
+    "@docusaurus/no-untranslated-text": "warn"
+  }
+}
+```
 
-### `-t, --typescript` {#typescript}
+## Supported configs
 
-Used when the template argument is a recognized name. Currently, only `classic` provides a TypeScript variant.
+- Recommended: recommended rule set for most Docusaurus sites that should be extended from.
+- All: **all** rules enabled. This will change between minor versions, so you should not use this if you want to avoid unexpected breaking changes.
 
-### `-g, --git-strategy` {#git-strategy}
+## Supported rules
 
-Used when the template argument is a git repo. It needs to be one of:
+| Name                                                                            | Description                                                  |   |
+| ------------------------------------------------------------------------------- | ------------------------------------------------------------ | - |
+| [`@docusaurus/no-untranslated-text`](./no-untranslated-text.md)                 | Enforce text labels in JSX to be wrapped by translate calls  |   |
+| [`@docusaurus/string-literal-i18n-messages`](./string-literal-i18n-messages.md) | Enforce translate APIs to be called on plain text labels     | ✅ |
+| [`@docusaurus/no-html-links`](./no-html-links.md)                               | Ensures @docusaurus/Link is used instead of `<a>` tags | ✅ |
 
-- `deep`: preserves full git history
-- `shallow`: clones with `--depth=1`
-- `copy`: does a shallow clone, but does not create a git repo
-- `custom`: enter your custom git clone command. We will prompt you for it. You can write something like `git clone --depth 10`, and we will append the repository URL and destination directory.
+✅ = recommended
 
-### `-p, --package-manager` {#package-manager}
+## Example configuration
 
-Value should be one of `npm`, `yarn`, or `pnpm`. If it's not explicitly provided, Docusaurus will infer one based on:
+Here's an example configuration:
 
-- The lockfile already present in the CWD (e.g. if you are setting up website in an existing project)
-- The command used to invoke `create-docusaurus` (e.g. `npm init`, `npx`, `yarn create`, etc.)
-- Interactive prompting, in case all heuristics are not present
-
-### `-s, --skip-install` {#skip-install}
-
-If provided, Docusaurus will not automatically install dependencies after creating the app. The `--package-manager` option is only useful when you are actually installing dependencies.
+```js title=".eslintrc.js"
+module.exports = {
+  extends: ['plugin:@docusaurus/recommended'],
+  rules: {
+    '@docusaurus/no-untranslated-text': [
+      'warn',
+      {ignoredStrings: ['·', '—', '×']},
+    ],
+  },
+};
+```

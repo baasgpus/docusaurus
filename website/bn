@@ -1,16 +1,9 @@
 ---
-unlisted: true
 tags:
   - visibility
-  - unlisted
+  - listed
 ---
 
-# Some Unlisteds - Subcategory index unlisted
+# Some Unlisteds - Listed 1
 
-Doc with unlisted front matter
-
-```mdx-code-block
-import DocCardList from '@theme/DocCardList';
-
-<DocCardList />
-```
+Regular doc

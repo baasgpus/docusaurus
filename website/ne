@@ -1,13 +1,13 @@
 ---
-title: First post with footnote to test posts with same footnote reference.
+title: Unlisted blog post
+unlisted: true
+tags:
+  - blog
+  - visibility
+  - unlisted
+slug: /unlisted-post
 ---
 
-foo[^1]
+This unlisted blog post should be "hidden" in production, but remain accessible.
 
-bar[^2]
-
-baz[^3]
-
-[^1]: foo
-[^2]: bar
-[^3]: baz
+It is filtered from the sidebar, sitemap, SEO indexation...

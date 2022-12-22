@@ -5,95 +5,66 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-.showcaseCardImage {
-  overflow: hidden;
-  height: 150px;
-  border-bottom: 2px solid var(--ifm-color-emphasis-200);
+import React, {useState, useEffect, useCallback} from 'react';
+import clsx from 'clsx';
+import {useHistory, useLocation} from '@docusaurus/router';
+
+import {prepareUserState} from '../../index';
+
+import styles from './styles.module.css';
+
+export type Operator = 'OR' | 'AND';
+
+export const OperatorQueryKey = 'operator';
+
+export function readOperator(search: string): Operator {
+  return (new URLSearchParams(search).get(OperatorQueryKey) ??
+    'OR') as Operator;
 }
 
-.showcaseCardHeader {
-  display: flex;
-  align-items: center;
-  margin-bottom: 12px;
-}
+export default function ShowcaseFilterToggle(): JSX.Element {
+  const id = 'showcase_filter_toggle';
+  const location = useLocation();
+  const history = useHistory();
+  const [operator, setOperator] = useState(false);
+  useEffect(() => {
+    setOperator(readOperator(location.search) === 'AND');
+  }, [location]);
+  const toggleOperator = useCallback(() => {
+    setOperator((o) => !o);
+    const searchParams = new URLSearchParams(location.search);
+    searchParams.delete(OperatorQueryKey);
+    if (!operator) {
+      searchParams.append(OperatorQueryKey, 'AND');
+    }
+    history.push({
+      ...location,
+      search: searchParams.toString(),
+      state: prepareUserState(),
+    });
+  }, [operator, location, history]);
 
-.showcaseCardTitle {
-  margin-bottom: 0;
-  flex: 1 1 auto;
-}
-
-.showcaseCardTitle a {
-  text-decoration: none;
-  background: linear-gradient(
-      var(--ifm-color-primary),
-      var(--ifm-color-primary)
-    )
-    0% 100% / 0% 1px no-repeat;
-  transition: background-size ease-out 200ms;
-}
-
-.showcaseCardTitle a:not(:focus):hover {
-  background-size: 100% 1px;
-}
-
-.showcaseCardTitle,
-.showcaseCardHeader .svgIconFavorite {
-  margin-right: 0.25rem;
-}
-
-.showcaseCardHeader .svgIconFavorite {
-  color: var(--site-color-svg-icon-favorite);
-}
-
-.showcaseCardSrcBtn {
-  margin-left: 6px;
-  padding-left: 12px;
-  padding-right: 12px;
-  border: none;
-}
-
-.showcaseCardSrcBtn:focus-visible {
-  background-color: var(--ifm-color-secondary-dark);
-}
-
-[data-theme='dark'] .showcaseCardSrcBtn {
-  background-color: var(--ifm-color-emphasis-200) !important;
-  color: inherit;
-}
-
-[data-theme='dark'] .showcaseCardSrcBtn:hover {
-  background-color: var(--ifm-color-emphasis-300) !important;
-}
-
-.showcaseCardBody {
-  font-size: smaller;
-  line-height: 1.66;
-}
-
-.cardFooter {
-  display: flex;
-  flex-wrap: wrap;
-}
-
-.tag {
-  font-size: 0.675rem;
-  border: 1px solid var(--ifm-color-secondary-darkest);
-  cursor: default;
-  margin-right: 6px;
-  margin-bottom: 6px !important;
-  border-radius: 12px;
-  display: inline-flex;
-  align-items: center;
-}
-
-.tag .textLabel {
-  margin-left: 8px;
-}
-
-.tag .colorLabel {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  margin-left: 6px;
-  margin-right: 6px;
+  return (
+    <div>
+      <input
+        type="checkbox"
+        id={id}
+        className="screen-reader-only"
+        aria-label="Toggle between or and and for the tags you selected"
+        onChange={toggleOperator}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter') {
+            toggleOperator();
+          }
+        }}
+        checked={operator}
+      />
+      <label htmlFor={id} className={clsx(styles.checkboxLabel, 'shadow--md')}>
+        {/* eslint-disable @docusaurus/no-untranslated-text */}
+        <span className={styles.checkboxLabelOr}>OR</span>
+        <span className={styles.checkboxLabelAnd}>AND</span>
+        {/* eslint-enable @docusaurus/no-untranslated-text */}
+      </label>
+    </div>
+  );
 }

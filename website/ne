@@ -1,58 +1,146 @@
----
-sidebar_position: 0
-slug: /api/misc/create-docusaurus
----
-
-# 📦 create-docusaurus
-
-A scaffolding utility to help you instantly set up a functional Docusaurus app.
-
-## Usage {#usage}
-
-```bash
-npx create-docusaurus@latest [name] [template] [rootDir]
-```
-
-The `name` argument will be used as the site's path as well as the `name` field in the created app's package.json. It can be an absolute path, or a path relative to `rootDir`.
-
-The `template` argument can be one of the following:
-
-- `classic`: Uses the classic template (recommended)
-- `facebook`: Uses the Facebook/Meta template, which contains some Meta-specific setup
-- A git repo URL (beginning with `https://` or `git@`), which can be cloned to the destination
-- A local file path relative to CWD, which contains the files to be copied to destination
-
-The `rootDir` will be used to resolve the absolute path to the site directory. The default is CWD.
+# Plugin Method References
 
 :::caution
 
-This command should be preferably used in an interactive shell so all features are available.
+This section is a work in progress. Anchor links or even URLs are not guaranteed to be stable.
 
 :::
 
-## Options {#options}
+Plugin APIs are shared by themes and plugins—themes are loaded just like plugins.
 
-### `-t, --typescript` {#typescript}
+## Plugin module {#plugin-module}
 
-Used when the template argument is a recognized name. Currently, only `classic` provides a TypeScript variant.
+Every plugin is imported as a module. The module is expected to have the following members:
 
-### `-g, --git-strategy` {#git-strategy}
+- A **default export**: the constructor function for the plugin.
+- **Named exports**: the [static methods](./static-methods.md) called before plugins are initialized.
 
-Used when the template argument is a git repo. It needs to be one of:
+## Plugin constructor {#plugin-constructor}
 
-- `deep`: preserves full git history
-- `shallow`: clones with `--depth=1`
-- `copy`: does a shallow clone, but does not create a git repo
-- `custom`: enter your custom git clone command. We will prompt you for it. You can write something like `git clone --depth 10`, and we will append the repository URL and destination directory.
+The plugin module's default export is a constructor function with the signature `(context: LoadContext, options: PluginOptions) => Plugin | Promise<Plugin>`.
 
-### `-p, --package-manager` {#package-manager}
+### `context` {#context}
 
-Value should be one of `npm`, `yarn`, or `pnpm`. If it's not explicitly provided, Docusaurus will infer one based on:
+`context` is plugin-agnostic, and the same object will be passed into all plugins used for a Docusaurus website. The `context` object contains the following fields:
 
-- The lockfile already present in the CWD (e.g. if you are setting up website in an existing project)
-- The command used to invoke `create-docusaurus` (e.g. `npm init`, `npx`, `yarn create`, etc.)
-- Interactive prompting, in case all heuristics are not present
+```ts
+type LoadContext = {
+  siteDir: string;
+  generatedFilesDir: string;
+  siteConfig: DocusaurusConfig;
+  outDir: string;
+  baseUrl: string;
+};
+```
 
-### `-s, --skip-install` {#skip-install}
+### `options` {#options}
 
-If provided, Docusaurus will not automatically install dependencies after creating the app. The `--package-manager` option is only useful when you are actually installing dependencies.
+`options` are the [second optional parameter when the plugins are used](../../using-plugins.md#configuring-plugins). `options` are plugin-specific and are specified by users when they use them in `docusaurus.config.js`. If there's a [`validateOptions`](./static-methods.md#validateOptions) function exported, the `options` will be validated and normalized beforehand.
+
+Alternatively, if a preset contains the plugin, the preset will then be in charge of passing the correct options into the plugin. It is up to the individual plugin to define what options it takes.
+
+## Example {#example}
+
+Here's a mental model for a presumptuous plugin implementation.
+
+```js
+// A JavaScript function that returns an object.
+// `context` is provided by Docusaurus. Example: siteConfig can be accessed from context.
+// `opts` is the user-defined options.
+async function myPlugin(context, opts) {
+  return {
+    // A compulsory field used as the namespace for directories to cache
+    // the intermediate data for each plugin.
+    // If you're writing your own local plugin, you will want it to
+    // be unique in order not to potentially conflict with imported plugins.
+    // A good way will be to add your own project name within.
+    name: 'docusaurus-my-project-cool-plugin',
+
+    async loadContent() {
+      // The loadContent hook is executed after siteConfig and env has been loaded.
+      // You can return a JavaScript object that will be passed to contentLoaded hook.
+    },
+
+    async contentLoaded({content, actions}) {
+      // The contentLoaded hook is done after loadContent hook is done.
+      // `actions` are set of functional API provided by Docusaurus (e.g. addRoute)
+    },
+
+    async postBuild(props) {
+      // After docusaurus <build> finish.
+    },
+
+    // TODO
+    async postStart(props) {
+      // docusaurus <start> finish
+    },
+
+    // TODO
+    afterDevServer(app, server) {
+      // https://webpack.js.org/configuration/dev-server/#devserverbefore
+    },
+
+    // TODO
+    beforeDevServer(app, server) {
+      // https://webpack.js.org/configuration/dev-server/#devserverafter
+    },
+
+    configureWebpack(config, isServer, utils, content) {
+      // Modify internal webpack config. If returned value is an Object, it
+      // will be merged into the final config using webpack-merge;
+      // If the returned value is a function, it will receive the config as the 1st argument and an isServer flag as the 2nd argument.
+    },
+
+    getPathsToWatch() {
+      // Paths to watch.
+    },
+
+    getThemePath() {
+      // Returns the path to the directory where the theme components can
+      // be found.
+    },
+
+    getClientModules() {
+      // Return an array of paths to the modules that are to be imported
+      // in the client bundle. These modules are imported globally before
+      // React even renders the initial UI.
+    },
+
+    extendCli(cli) {
+      // Register an extra command to enhance the CLI of Docusaurus
+    },
+
+    injectHtmlTags({content}) {
+      // Inject head and/or body HTML tags.
+    },
+
+    async getTranslationFiles({content}) {
+      // Return translation files
+    },
+
+    translateContent({content, translationFiles}) {
+      // translate the plugin content here
+    },
+
+    translateThemeConfig({themeConfig, translationFiles}) {
+      // translate the site themeConfig here
+    },
+
+    async getDefaultCodeTranslationMessages() {
+      // return default theme translations here
+    },
+  };
+}
+
+myPlugin.validateOptions = ({options, validate}) => {
+  const validatedOptions = validate(myValidationSchema, options);
+  return validationOptions;
+};
+
+myPlugin.validateThemeConfig = ({themeConfig, validate}) => {
+  const validatedThemeConfig = validate(myValidationSchema, options);
+  return validatedThemeConfig;
+};
+
+module.exports = myPlugin;
+```

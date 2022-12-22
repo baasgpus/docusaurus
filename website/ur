@@ -1,17 +1,30 @@
-## Head Metadata tests
+/**
+ * Copyright (c) Facebook, Inc. and its affiliates.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
 
-This page declares the following custom head metadata:
+import React from 'react';
+import Link from '@docusaurus/Link';
+import Layout from '@theme/Layout';
 
-```html
-<head>
-  <meta name="generator" value="custom generator name!" />
-  <meta name="viewport" content="initial-scale=1, viewport-fit=cover" />
-  <meta name="robots" content="noindex, nofollow, my-extra-directive" />
-</head>
-```
+// Repro for hydration issue https://github.com/facebook/docusaurus/issues/5617
+function BuggyText() {
+  return (
+    <span>
+      Built using the <Link to="https://www.electronjs.org/">Electron</Link> ,
+      based on <Link to="https://www.chromium.org/">Chromium</Link>, and written
+      using <Link to="https://www.typescriptlang.org/">TypeScript</Link> ,
+      Xplorer promises you an unprecedented experience.
+    </span>
+  );
+}
 
-<head>
-  <meta name="generator" value="custom generator name!" />
-  <meta name="viewport" content="initial-scale=1, viewport-fit=cover" />
-  <meta name="robots" content="noindex, nofollow, my-extra-directive" />
-</head>
+export default function Home(): JSX.Element {
+  return (
+    <Layout>
+      <BuggyText />
+    </Layout>
+  );
+}

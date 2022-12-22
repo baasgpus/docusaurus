@@ -1,122 +1,159 @@
 ---
-title: Docusaurus 2.2
-authors:
-  - slorber
+title: Introducing Docusaurus
+authors: JMarcey
 tags:
-  - release
-image: ./img/social-card.png
-date: 2022-10-29
+  - documentation
+  - blog
+  - docusaurus
 ---
 
-We are happy to announce **Docusaurus 2.2**.
+![](/img/slash-introducing.svg)
 
-The upgrade should be easy: as explained in our [release process documentation](/community/release-process), minor versions respect [Semantic Versioning](https://semver.org/).
+We are very happy to introduce [Docusaurus](https://github.com/facebook/docusaurus) to help you manage one or many open source websites.
 
-![Docusaurus 2.2 social card](./img/social-card.png)
+We created [Docusaurus](https://docusaurus.io) for the following reasons:
+
+1. To put the focus on writing good documentation instead of worrying about the infrastructure of a website.
+1. To provide features that many of our open source websites need like blog support, search and versioning.
+1. To make it easy to push updates, new features, and bug fixes to everyone all at once.
+1. And, finally, to provide a consistent look and feel across all of our open source projects.
 
 <!--truncate-->
 
-## Highlights
+Docusaurus is a tool designed to make it easy for teams to publish documentation websites without having to worry about the infrastructure and design details. At its core, all a user has to provide are documentation files written in Markdown, customization of a provided home page written in React, and a few configuration modifications. Docusaurus handles the rest by providing default styles, site formatting, and simple document navigation. Getting started is easy, as users can [install](https://v1.docusaurus.io/docs/en/installation.html) it using `npm` or `yarn` via a simple initialization script that [creates a working example website out of the box](https://v1.docusaurus.io/docs/en/site-preparation.html).
 
-### Mermaid diagrams
+Docusaurus also provides core website and documentation features out-of-the-box including [blog support](https://v1.docusaurus.io/docs/en/blog.html), [internationalization](https://v1.docusaurus.io/docs/en/translation.html), [search](https://v1.docusaurus.io/docs/en/search.html), and [versioning](https://v1.docusaurus.io/docs/en/versioning.html). While some projects may not require any of these features, enabling them is generally a matter of updating configuration options instead of having to add the infrastructure from the ground up. As more features get added to Docusaurus, users just can easily update to the latest version. This can be done by simply running npm or yarn update and updating configuration options. Users or teams will no longer need to manually rework their entire website infrastructure each time a new feature gets added.
 
-In [#7490](https://github.com/facebook/docusaurus/pull/7490), we added support for Mermaid diagrams. This fills the gap between GitHub Flavored Markdown which also [added support recently](https://github.blog/2022-02-14-include-diagrams-markdown-files-mermaid/). You can create Mermaid diagrams using Markdown code blocks:
+## The Birth of docusaurus
 
-````md
-```mermaid
-sequenceDiagram
-    participant Alice
-    participant Bob
-    Alice->>John: Hello John, how are you?
-    loop Health check
-        John->>John: Fight against hypochondria
-    end
-    Note right of John: Rational thoughts <br/>prevail!
-    John-->>Alice: Great!
-    John->>Bob: How about you?
-    Bob-->>John: Jolly good!
-```
-````
+![](/img/slash-birth.png)
 
-````mdx-code-block
-import BrowserWindow from '@site/src/components/BrowserWindow';
+When Facebook first started their open source program, many teams implemented a custom website for each of their open source projects. This approach presented challenges when the open source program team was asked to help the project teams improve their documentation. Since each site was unique, adding basic infrastructure such as a blog, consistent navigation, search, etc. became challenging undertakings.
 
-<BrowserWindow>
+The open source team tried to help mitigate this problem by coming up with a standard template, based on Jekyll, that could be used as a starting point for a project website. We asked our new projects to manually copy our template source to their repo, write their docs, and publish. This template approach was adopted by most of open source projects launched; some existing projects even converted their custom website implementations to the new template as well.
 
-```mermaid
-sequenceDiagram
-    participant Alice
-    participant Bob
-    Alice->>John: Hello John, how are you?
-    loop Health check
-        John->>John: Fight against hypochondria
-    end
-    Note right of John: Rational thoughts <br/>prevail!
-    John-->>Alice: Great!
-    John->>Bob: How about you?
-    Bob-->>John: Jolly good!
-```
+The problem with the "copy the template to your repo" approach is that, even though the platform is consistent, pushing updates becomes unmaintainable across an entire suite of projects already using the template. This is because we lost control of the template after a project copied it to their repo. Projects were free to modify the template as desired and apply their own project-specific features to it. So while projects share the same site generation platform, they have now diverted enough where they cannot take advantage of the new features we have added to the template over time. There was no easy way we could ask all current projects to "copy" a new version of the template since it might break their existing site or remove features that they have added on their own. Instead, we would have to apply the updates manually to each project one-by-one. This became very problematic when projects started asking for our team for internationalization support within the template, requiring low-level changes to how the template was structured and generated.
 
-</BrowserWindow>
+So we started thinking about what we could do to help mitigate the challenge of keeping sites updated and consistent across our entire portfolio. We also wanted multiple projects to share the same site generation software. We wanted them to start out with the same template, and yet have the flexibility to customize and adapt their site theme to suit their needs. They should be able to extend and customize their site, but when we update the underlying infrastructure with fixes and features, the project should be able update simply and without any breaking changes.
 
-````
-Make sure to check the [documentation](/docs/markdown-features/diagrams), and the [more advanced examples](/tests/pages/diagrams)
-### Config `headTags`
-In [#8151](https://github.com/facebook/docusaurus/pull/8151), we added the ability to apply arbitrary HTML `<head>` tags to all pages of your site.
+Docusaurus was born!
 
-```js title="docusaurus.config.js"
-module.exports = {
-  headTags: [
-    {
-      tagName: 'link',
-      attributes: {
-        rel: 'icon',
-        href: '/img/docusaurus.png',
-      },
-    },
-  ],
-};
+At Facebook, Docusaurus allows us to quickly get different projects up and running with documentation websites, especially for teams who don't have much experience with web development or primarily want a basic site to showcase their project. Docusaurus already supports sites needing more advanced features like internationalization for Jest and versioning for React Native. As different projects request new features for their sites, they are added to Docusaurus and simultaneously provided to all projects! All together, this ends up greatly reducing the work needed to maintain different sites for different projects. Our teams are able to focus on keeping their projects healthier by spending more time adding features, fixing bugs, and writing documentation.
+
+## Getting Up and Running
+
+![](/img/slash-up-and-running.png)
+
+At its core, we wanted sites running Docusaurus to be simple to use. With one [installation](https://v1.docusaurus.io/docs/en/installation.html) command and some simple [configuration](https://v1.docusaurus.io/docs/en/site-preparation.html), you can actually have a default running website.
+
+When you run `docusaurus-init`, you will see a structure similar to:
+
+```bash
+root-of-repo
+├── docs-examples-from-docusaurus
+│   ├── doc1.md
+│   ├── doc2.md
+│   ├── doc3.md
+│   ├── example-doc4.md
+│   └── example-doc5.md
+├── website
+│   ├── blog-examples-from-docusaurus
+│   │   ├── 2016-03-11-blog-post.md
+│   │   └── 2017-04-10-blog-post-two.md
+│   ├── core
+│   │   └── Footer.js
+│   ├── node_modules
+│   ├── package.json
+│   ├── pages
+│   ├── sidebars.json
+│   ├── siteConfig.js
+│   └── static
 ```
 
-### Accessibility
+With the exception of node_modules and package.json, all the directories and files you see are where you customize and add content to your Docusaurus-based website. The docs folder is where you add your Markdown that represents your documentation; the blog folder is where you add your Markdown for your [blog posts](https://v1.docusaurus.io/docs/en/blog.html); `siteConfig.js` is where you make most of the [customizations](https://v1.docusaurus.io/docs/en/site-config.html) for your site; `sidebars.json` is where you maintain the layout and content of the [sidebar](https://v1.docusaurus.io/docs/en/navigation.html) for your documentation; the `pages` folder is where you add [custom](https://v1.docusaurus.io/docs/en/custom-pages.html) pages for your site; the `static` folder is where all of your static assets go (e.g., CSS stylesheets and images); and the `core` folder is where you can customize core components of the site, in this case the footer.
 
-We did several accessibility improvements:
+## How does Docusaurus work?
 
-- [#8207](https://github.com/facebook/docusaurus/pull/8207): improves keyboard navigation for mobile drawer hamburger button
-- [#8161](https://github.com/facebook/docusaurus/pull/8161): improves keyboard navigation for tabs
-- [#8204](https://github.com/facebook/docusaurus/pull/8204): makes the skip to content button support progressive enhancement
-- [#8174](https://github.com/facebook/docusaurus/pull/8174): improves screen reader announcement when toggling between light/dark mode
+Docusaurus is written primarily in JavaScript and [React](https://facebook.github.io/react), replacing Jekyll which we used in the old template. We use [Remarkable](https://github.com/jonschlinkert/remarkable) for our Markdown rendering and [highlight.js](https://highlightjs.org/) for our code block syntax highlighting. The core of Docusaurus' functionality is in the [lib directory](https://github.com/facebookexperimental/Docusaurus/tree/master/lib) of the [Docusaurus repo](https://github.com/facebook/docusaurus/). The general structure looks like:
 
-### Developer Experience
+```bash
+root-of-Docusaurus
+├── lib
+│   ├── core
+│   ├── server
+│   │   ├── generate.js
+│   │   ├── server.js
+│   │   └── ...and more files
+│   ├── static
+│   ├── build-files.js
+│   ├── copy-examples.js
+│   ├── generate-feed.js
+│   ├── publish-gh-pages.js
+│   ├── rename-version.js
+│   ├── start-server.js
+│   ├── versions.js
+│   └── write-translations.js
+```
 
-We made validation stricter and improved error messages:
+The key files here are build-files.js and start-server.js. There are many similarities between these two files: `build-files.js` is used to build the physical artifacts for serving by an external web server. `start-server.js` is used to run the Docusaurus server and locally test your site. Both go through the following general process to take all of the Markdown and configuration to create a runnable website:
 
-- [#8234](https://github.com/facebook/docusaurus/pull/8234): in case of doc processing failure, prints the problematic markdown file path in the error message
-- [#8192](https://github.com/facebook/docusaurus/pull/8192) and [#8159](https://github.com/facebook/docusaurus/pull/8159): validates `siteConfig.url` more strictly and with better error message
-- [#8066](https://github.com/facebook/docusaurus/pull/8066): makes config `url` and `baseUrl` fail-safe and less sensitive to the presence or absence of a leading or trailing slash
+1. Process your website settings in `siteConfig.js`
+1. Read the document metadata that exists in all the Markdown files in your docs directory.
+1. Create a table of contents for your documents based upon the IDs extracted from the metadata.
+1. Convert the Markdown to HTML, including doing link replacement.
+1. These files will go in a build/docs directory of the compiled site, and any translated versions will go into a language specific folder within the build/docs folder.
+1. Repeat 1-3 for blog posts.
+1. The blog file will go in a build/blog directory of the compiled site.
+1. Read the main.css file and concatenate any user-defined css into master css file that will be in the build/css directory of the compiled site.
+1. Copy images into an build/img directory of the compiled site.
+1. Take any custom pages that were added to the pages folder of the site and compile/copy those into the root build directory of the compiled site. Any translated versions will go into a language specific folder within build.
+1. Create CNAME and sitemap.xml files and add those to build.
 
-### Translations
+Note that this process does not take into full account how translations or versioning works. The underlying details of those features will be saved for future blog posts.
 
-We completed the default theme translation support for multiple languages:
+The final structure of your compiled site will look similar to:
 
-- 🇹🇷 [#8105](https://github.com/facebook/docusaurus/pull/8105): completes Turkish translations
-- 🇷🇺 [#8253](https://github.com/facebook/docusaurus/pull/8253): completes Russian translations
-- 🇫🇷 [#8243](https://github.com/facebook/docusaurus/pull/8243): completes French translations
-- 🇯🇵 [#8075](https://github.com/facebook/docusaurus/pull/8075): completes Japanese translations
+```bash
+build
+├── website
+│   ├── CNAME
+│   ├── blog
+│   ├── css
+│   ├── docs
+│   ├── en
+│   ├── help.html # custom page
+│   ├── img
+│   ├── index.html # landing page
+│   ├── sitemap.xml
+│   └── users.html # custom page
+```
 
-:::tip
+## Community
 
-Completing theme translations is an [ongoing effort](https://github.com/facebook/docusaurus/issues/3526) and an easy way to contribute to Docusaurus. We add new theme features regularly, for which we often [need new translations](https://github.com/facebook/docusaurus/issues/3526).
+![](/img/docusaurus.svg)
 
-:::
+We welcome your [contributions](https://github.com/facebook/docusaurus/blob/master/CONTRIBUTING.md) to Docusaurus, whether you want to use it for your own site, you want to [contribute](https://github.com/facebook/docusaurus/blob/master/CONTRIBUTING.md) to the Docusaurus core or just have questions. Follow us on [GitHub](https://github.com/facebook/docusaurus) and [Twitter](https://twitter.com/docusaurus).
 
-## Other changes
+## Acknowledgements
 
-Other notable changes include:
+Docusaurus wouldn't exist without the work of the rest of the core Docusaurus team: [Eric Nakagawa](http://twitter.com/ericnakagawa), [Hector Ramos](https://twitter.com/hectorramos), [Eric Vicenti](https://twitter.com/EricVicenti) and [Frank Li](https://github.com/deltice) — a former intern at Facebook who implemented the core technology and features.
 
-- [#8210](https://github.com/facebook/docusaurus/pull/8210): the `docusaurus swizzle` CLI has a new `--config` option
-- [#8109](https://github.com/facebook/docusaurus/pull/8109): mobile navigation performance optimizations, prefetch resources earlier
-- [#8059](https://github.com/facebook/docusaurus/pull/8059): versions/locales navbar dropdowns preserve hash and querystring on navigation
-- [#8227](https://github.com/facebook/docusaurus/pull/8227): the client redirect plugin preserves hash and querystring on redirect
+Special thanks also goes out to our earliest [adopters](https://v1.docusaurus.io/en/users.html) of Docusaurus:
 
-Check the **[2.2.0 changelog entry](/changelog/2.2.0)** for an exhaustive list of changes.
+- [BuckleScript](https://bucklescript.github.io/)
+- [FastText](https://fasttext.cc)
+- [Jest](https://jestjs.io)
+- [Make It Open](http://makeitopen.com)
+- [Prettier](https://prettier.io/)
+- [Reason-react](https://reasonml.github.io/reason-react/)
+- [React Native](https://facebook.github.io/react-native/)
+- [Relay](https://facebook.github.io/relay/)
+
+Without their dedication to creating or migrating their websites over to the platform, we would have not have been in the position where we are today.
+
+## Resources
+
+- [Read our documentation](https://v1.docusaurus.io)
+- [Follow our Twitter feed](https://twitter.com/docusaurus)
+- [Follow us on GitHub](https://github.com/facebook/docusaurus)
+- [About Slash, the Docusaurus mascot](https://v1.docusaurus.io/about-slash.html)

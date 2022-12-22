@@ -1,25 +1,10 @@
 ---
-image: ./img/oss_logo.png
+toc_min_heading_level: 2
+toc_max_heading_level: 2
 ---
 
-# Image tests
+import Content, { toc as ContentToc, } from '@site/_dogfooding/_partials/toc-tests.md';
 
-import Image from '@theme/IdealImage';
+<Content />
 
-import docusaurusImport from '@site/static/img/docusaurus.png';
-
-export const docusaurusRequire = require('@site/static/img/docusaurus.png');
-
-![URL encoded image](./img/oss_logo%20%282%29.png)
-
-## Regular images
-
-<img src={docusaurusImport} />
-
-<img src={docusaurusRequire.default} />
-
-## Ideal images
-
-<Image img={docusaurusImport} />
-
-<Image img={docusaurusRequire} />
+export const toc = ContentToc;

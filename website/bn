@@ -6,119 +6,14 @@
  */
 
 import React from 'react';
-import {
-  useLatestVersion,
-  useActiveDocContext,
-  useVersions,
-} from '@docusaurus/plugin-content-docs/client';
-import Link from '@docusaurus/Link';
-import useIsBrowser from '@docusaurus/useIsBrowser';
-import Translate from '@docusaurus/Translate';
-import Admonition from '@theme/Admonition';
-import CodeBlock from '@theme/CodeBlock';
+import Svg, {type SvgIconProps} from '@site/src/components/Svg';
 
-const docsPluginId = undefined; // Default docs plugin instance
-
-function PackageJson() {
-  const latestVersion = useLatestVersion(docsPluginId);
-  const allVersions = useVersions(docsPluginId);
-  // Only happens in deploy preview / local dev, but still nice
-  const versionName =
-    latestVersion.name === 'current' && allVersions.length > 1
-      ? allVersions[1]!.name
-      : latestVersion.name;
+export default function FavoriteIcon(
+  props: Omit<SvgIconProps, 'children'>,
+): JSX.Element {
   return (
-    <CodeBlock language="json" title="package.json">{`{
-  "dependencies": {
-    "@docusaurus/core": "${versionName}",
-    "@docusaurus/preset-classic": "${versionName}",
-    // ...
-  }
-}`}</CodeBlock>
-  );
-}
-
-function VersionNotice() {
-  const latestVersion = useLatestVersion(docsPluginId);
-  const activeVersion = useActiveDocContext(docsPluginId).activeVersion!;
-  const isBrowser = useIsBrowser();
-  // It's possible that the user is browsing a snapshot version
-  // which is only detectable once we are in the browser
-  if (isBrowser) {
-    const location = window.location.hostname;
-    if (
-      location.includes('netlify.app') &&
-      !location.includes('deploy-preview')
-    ) {
-      return (
-        <Admonition type="caution">
-          <p>
-            <Translate
-              id="upgradeGuide.archivedVersion.notice"
-              values={{
-                mainSiteLink: (
-                  <Link href="https://docusaurus.io/docs/installation">
-                    <Translate id="upgradeGuide.archivedVersion.notice.mainSiteLink.label">
-                      main site
-                    </Translate>
-                  </Link>
-                ),
-              }}>
-              {
-                'You are browsing an archived version and the snippet below is outdated. Please go to the {mainSiteLink} and follow the instructions there to upgrade to the latest version.'
-              }
-            </Translate>
-          </p>
-        </Admonition>
-      );
-    }
-  }
-  if (activeVersion.name === 'current') {
-    return (
-      <Admonition type="info">
-        <p>
-          <Translate
-            id="upgradeGuide.unreleasedVersion.notice"
-            values={{
-              canaryDocLink: (
-                <Link href="/community/canary">
-                  <Translate
-                    id="upgradeGuide.unreleasedVersion.notice.canaryDocLink.label"
-                    // eslint-disable-next-line @docusaurus/no-untranslated-text
-                    values={{canaryTag: <code>@canary</code>}}>
-                    {'{canaryTag} release'}
-                  </Translate>
-                </Link>
-              ),
-            }}>
-            {
-              'You are browsing the documentation of an unreleased version. If you want to use any unreleased feature, you can use the {canaryDocLink}.'
-            }
-          </Translate>
-        </p>
-      </Admonition>
-    );
-  }
-  if (activeVersion.name !== latestVersion.name) {
-    return (
-      <Admonition type="caution">
-        <p>
-          <Translate id="upgradeGuide.outdatedVersion.notice">
-            You are browsing the documentation of an outdated version. The
-            snippet below shows how to upgrade to the latest version.
-          </Translate>
-        </p>
-      </Admonition>
-    );
-  }
-  return null;
-}
-
-export default function UpgradeGuide(): JSX.Element {
-  return (
-    <>
-      <VersionNotice />
-      <PackageJson />
-    </>
+    <Svg {...props}>
+      <path d="M12,21.35L10.55,20.03C5.4,15.36 2,12.27 2,8.5C2,5.41 4.42,3 7.5,3C9.24,3 10.91,3.81 12,5.08C13.09,3.81 14.76,3 16.5,3C19.58,3 22,5.41 22,8.5C22,12.27 18.6,15.36 13.45,20.03L12,21.35Z" />
+    </Svg>
   );
 }

@@ -1,21 +1,15 @@
-/**
- * Copyright (c) Facebook, Inc. and its affiliates.
- *
- * This source code is licensed under the MIT license found in the
- * LICENSE file in the root directory of this source tree.
- */
+---
+title: Markdown Page example
+description: Markdown Page example
+wrapperClassName: docusaurus-markdown-example
+---
 
-import React, {useState} from 'react';
+# Markdown page
 
-export default function MyComponent() {
-  const [bool, setBool] = useState(false);
-  return (
-    <div>
-      <p>MyComponent rendered !</p>
-      <p>bool={bool ? 'true' : 'false'}</p>
-      <p>
-        <button onClick={() => setBool((b) => !b)}>toggle bool</button>
-      </p>
-    </div>
-  );
-}
+This is a page generated from markdown to illustrate the Markdown page feature.
+
+:::tip
+
+Use Markdown pages when you just want to focus on content and the default layout is good enough
+
+:::

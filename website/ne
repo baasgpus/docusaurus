@@ -1,19 +1,17 @@
 ---
-title: Using twice the blog plugin
+title: Blog TOC FrontMatter tests
 authors:
   - slorber
+toc_min_heading_level: 2
+toc_max_heading_level: 4
 tags:
   - paginated-tag
-  - blog
-  - docusaurus
 ---
 
-Did you know you can use multiple instances of the same plugin?
+<!-- truncate -->
 
-<!--truncate-->
+import Content, { toc as ContentToc, } from '@site/_dogfooding/_partials/toc-tests.md';
 
-:::tip
+<Content />
 
-Using twice the blog plugin permits you to create more than one blog on the same Docusaurus website!
-
-:::
+export const toc = ContentToc;

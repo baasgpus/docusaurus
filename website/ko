@@ -1,257 +1,234 @@
 ---
-id: admonitions
-description: Handling admonitions/callouts in Docusaurus Markdown
-slug: /markdown-features/admonitions
+id: assets
+description: Handling assets in Docusaurus Markdown
+slug: /markdown-features/assets
 ---
 
-# Admonitions
+# Assets
 
 import BrowserWindow from '@site/src/components/BrowserWindow';
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
-import Admonition from '@theme/Admonition';
 
-In addition to the basic Markdown syntax, we have a special admonitions syntax by wrapping text with a set of 3 colons, followed by a label denoting its type.
+Sometimes you want to link to assets (e.g. docx files, images...) directly from Markdown files, and it is convenient to co-locate the asset next to the Markdown file using it.
 
-Example:
+Let's imagine the following file structure:
+
+```
+# Your doc
+/website/docs/myFeature.mdx
+
+# Some assets you want to use
+/website/docs/assets/docusaurus-asset-example-banner.png
+/website/docs/assets/docusaurus-asset-example.docx
+```
+
+## Images {#images}
+
+You can display images in three different ways: Markdown syntax, CJS require, or ES imports syntax.
+
+```mdx-code-block
+<Tabs>
+<TabItem value="Markdown syntax">
+```
+
+Display images using simple Markdown syntax:
 
 ```md
-:::note
-
-Some **content** with _Markdown_ `syntax`. Check [this `api`](#).
-
-:::  
-
-:::tip
-
-Some **content** with _Markdown_ `syntax`. Check [this `api`](#).
-
-:::  
-
-:::info
-
-Some **content** with _Markdown_ `syntax`. Check [this `api`](#).
-
-:::  
-
-:::caution
-
-Some **content** with _Markdown_ `syntax`. Check [this `api`](#).
-
-:::  
-
-:::danger
-
-Some **content** with _Markdown_ `syntax`. Check [this `api`](#).
-
-:::  
+![Example banner](./assets/docusaurus-asset-example-banner.png)
 ```
 
 ```mdx-code-block
-<BrowserWindow>
-
-:::note
-
-Some **content** with _Markdown_ `syntax`. Check [this `api`](#).
-
-:::  
-
-:::tip
-
-Some **content** with _Markdown_ `syntax`. Check [this `api`](#).
-
-:::  
-
-:::info
-
-Some **content** with _Markdown_ `syntax`. Check [this `api`](#).
-
-:::  
-
-:::caution
-
-Some **content** with _Markdown_ `syntax`. Check [this `api`](#).
-
-:::  
-
-:::danger
-
-Some **content** with _Markdown_ `syntax`. Check [this `api`](#).
-
-:::  
-
-</BrowserWindow>
+</TabItem>
+<TabItem value="CommonJS require">
 ```
 
-## Usage with Prettier {#usage-with-prettier}
-
-If you use [Prettier](https://prettier.io) to format your Markdown files, Prettier might auto-format your code to invalid admonition syntax. To avoid this problem, add empty lines around the starting and ending directives. This is also why the examples we show here all have empty lines around the content.
-
-<!-- prettier-ignore -->
-```md
-<!-- Prettier doesn't change this -->
-:::note
-
-Hello world
-
-:::  
-
-<!-- Prettier changes this -->
-:::note
-Hello world
-:::  
-
-<!-- to this -->
-::: note Hello world
-:::
-```
-
-## Specifying title {#specifying-title}
-
-You may also specify an optional title.
-
-```md
-:::note Your Title
-
-Some **content** with _Markdown_ `syntax`.
-
-:::  
-```
-
-```mdx-code-block
-<BrowserWindow>
-
-:::note Your Title
-
-Some **content** with _Markdown_ `syntax`.
-
-:::  
-
-</BrowserWindow>
-```
-
-## Admonitions with MDX {#admonitions-with-mdx}
-
-You can use MDX inside admonitions too!
+Display images using inline CommonJS `require` in JSX image tag:
 
 ```jsx
-import Tabs from '@theme/Tabs';
-
-import TabItem from '@theme/TabItem';
-
-:::tip Use tabs in admonitions
-
-<Tabs>
-  <TabItem value="apple" label="Apple">This is an apple 🍎</TabItem>
-  <TabItem value="orange" label="Orange">This is an orange 🍊</TabItem>
-  <TabItem value="banana" label="Banana">This is a banana 🍌</TabItem>
-</Tabs>
-
-:::  
+<img
+  src={require('./assets/docusaurus-asset-example-banner.png').default}
+  alt="Example banner"
+/>
 ```
 
 ```mdx-code-block
-<BrowserWindow>
-
-:::tip Use tabs in admonitions
-
-<Tabs>
-  <TabItem value="apple" label="Apple">This is an apple 🍎</TabItem>
-  <TabItem value="orange" label="Orange">This is an orange 🍊</TabItem>
-  <TabItem value="banana" label="Banana">This is a banana 🍌</TabItem>
-</Tabs>
-
-:::  
-
-</BrowserWindow>
+</TabItem>
+<TabItem value="Import statement">
 ```
 
-## Usage in JSX {#usage-in-jsx}
+Display images using ES `import` syntax and JSX image tag:
 
-Outside of Markdown, you can use the `@theme/Admonition` component to get the same output.
+```jsx
+import myImageUrl from './assets/docusaurus-asset-example-banner.png';
 
-```jsx title="MyReactPage.jsx"
-import Admonition from '@theme/Admonition';
-
-export default function MyReactPage() {
-  return (
-    <div>
-      <Admonition type="info">
-        <p>Some information</p>
-      </Admonition>
-    </div>
-  );
-}
-```
-
-The types that are accepted are the same as above: `note`, `tip`, `danger`, `info`, `caution`. Optionally, you can specify an icon by passing a JSX element or a string, or a title:
-
-```jsx title="MyReactPage.jsx"
-<Admonition type="tip" icon="💡" title="Did you know...">
-  <p>
-    Use plugins to introduce shorter syntax for the most commonly used JSX
-    elements in your project.
-  </p>
-</Admonition>
+<img src={myImageUrl} alt="Example banner" />;
 ```
 
 ```mdx-code-block
-<BrowserWindow>
-  <Admonition type="tip" icon="💡" title="Did you know...">
-    <p>
-      Use plugins to introduce shorter syntax for the most commonly used JSX
-      elements in your project.
-    </p>
-  </Admonition>
-</BrowserWindow>
+</TabItem>
+</Tabs>
 ```
 
-## Customizing admonitions {#customizing-admonitions}
+All of the above result in displaying the image:
 
-There are two kinds of customizations possible with admonitions: **parsing** and **rendering**.
+<BrowserWindow>
 
-### Customizing rendering behavior {#customizing-rendering-behavior}
+![My image alternative text](../../assets/docusaurus-asset-example-banner.png)
 
-You can customize how each individual admonition type is rendered through [swizzling](../../swizzling.md). You can often achieve your goal through a simple wrapper. For example, in the follow example, we swap out the icon for `info` admonitions only.
+</BrowserWindow>
 
-```jsx title="src/theme/Admonition.js"
-import React from 'react';
-import Admonition from '@theme-original/Admonition';
-import MyIcon from '@site/static/img/info.svg';
+:::note
 
-export default function AdmonitionWrapper(props) {
-  if (props.type !== 'info') {
-    return <Admonition {...props} />;
-  }
-  return <Admonition icon={<MyIcon />} {...props} />;
+If you are using [@docusaurus/plugin-ideal-image](../../api/plugins/plugin-ideal-image.md), you need to use the dedicated image component, as documented.
+
+:::
+
+## Files {#files}
+
+In the same way, you can link to existing assets by `require`'ing them and using the returned URL in `video`s, `a` anchor links, etc.
+
+```md
+# My Markdown page
+
+<a target="\_blank" href={require('./assets/docusaurus-asset-example.docx').default}> Download this docx </a>
+
+or
+
+[Download this docx using Markdown](./assets/docusaurus-asset-example.docx)
+```
+
+<BrowserWindow>
+
+<a
+  target="_blank"
+  href={require('../../assets/docusaurus-asset-example.docx').default}>
+  Download this docx
+</a>
+
+[Download this docx using Markdown](../../assets/docusaurus-asset-example.docx)
+
+</BrowserWindow>
+
+:::info Markdown links are always file paths
+
+If you use the Markdown image or link syntax, all asset paths will be resolved as file paths by Docusaurus and automatically converted to `require()` calls. You don't need to use `require()` in Markdown unless you use the JSX syntax, which you do have to handle yourself.
+
+:::
+
+## Inline SVGs {#inline-svgs}
+
+Docusaurus supports inlining SVGs out of the box.
+
+```jsx
+import DocusaurusSvg from './docusaurus.svg';
+
+<DocusaurusSvg />;
+```
+
+<BrowserWindow>
+
+import DocusaurusSvg from '@site/static/img/docusaurus.svg';
+
+<DocusaurusSvg />
+
+</BrowserWindow>
+
+This can be useful if you want to alter the part of the SVG image via CSS. For example, you can change one of the SVG colors based on the current theme.
+
+```jsx
+import DocusaurusSvg from './docusaurus.svg';
+
+<DocusaurusSvg className="themedDocusaurus" />;
+```
+
+```css
+[data-theme='light'] .themedDocusaurus [fill='#FFFF50'] {
+  fill: greenyellow;
+}
+
+[data-theme='dark'] .themedDocusaurus [fill='#FFFF50'] {
+  fill: seagreen;
 }
 ```
 
-### Customizing parsing behavior {#customizing-parsing-behavior}
+<BrowserWindow>
+  <DocusaurusSvg className="themedDocusaurus" />
+</BrowserWindow>
 
-Admonitions are implemented with a [Remark plugin](./markdown-features-plugins.mdx). The plugin is designed to be configurable. To customize the Remark plugin for a specific content plugin (docs, blog, pages), pass the options through the `admonitions` key.
+## Themed Images {#themed-images}
 
-```js title="docusaurus.config.js"
-module.exports = {
-  presets: [
-    [
-      '@docusaurus/preset-classic',
-      {
-        docs: {
-          admonitions: {
-            tag: ':::',
-            keywords: ['note', 'tip', 'info', 'caution', 'danger'],
-          },
-        },
-      },
-    ],
-  ],
-};
+Docusaurus supports themed images: the `ThemedImage` component (included in the themes) allows you to switch the image source based on the current theme.
+
+```jsx
+import ThemedImage from '@theme/ThemedImage';
+
+<ThemedImage
+  alt="Docusaurus themed image"
+  // highlight-start
+  sources={{
+    light: useBaseUrl('/img/docusaurus_light.svg'),
+    dark: useBaseUrl('/img/docusaurus_dark.svg'),
+  }}
+  // highlight-end
+/>;
 ```
 
-The plugin accepts two options:
+```mdx-code-block
+import useBaseUrl from '@docusaurus/useBaseUrl';
+import ThemedImage from '@theme/ThemedImage';
 
-- `tag`: The tag that encloses the admonition. Defaults to `:::`.
-- `keywords`: An array of keywords that can be used as the type for the admonition. Note that if you override this, the default values will not be applied.
+<BrowserWindow>
+<ThemedImage
+  alt="Docusaurus themed image"
+  sources={{
+    light: useBaseUrl('/img/docusaurus_keytar.svg'),
+    dark: useBaseUrl('/img/docusaurus_speed.svg'),
+  }}
+/>
+</BrowserWindow>
+```
 
-The `keyword` will be passed as the `type` prop of the `Admonition` component. If you register more types than the default, you are also responsible for providing their implementation—including the container's style, icon, default title text, etc. You would usually need to [eject](../../swizzling.md#ejecting) the `@theme/Admonition` component, so you could re-use the same infrastructure as the other types.
+### GitHub-style themed images {#github-style-themed-images}
+
+GitHub uses its own [image theming approach](https://github.blog/changelog/2021-11-24-specify-theme-context-for-images-in-markdown/) with path fragments, which you can easily implement yourself.
+
+To toggle the visibility of an image using the path fragment (for GitHub, it's `#gh-dark-mode-only` and `#gh-light-mode-only`), add the following to your custom CSS (you can also use your own suffix if you don't want to be coupled to GitHub):
+
+```css title="src/css/custom.css"
+[data-theme='light'] img[src$='#gh-dark-mode-only'],
+[data-theme='dark'] img[src$='#gh-light-mode-only'] {
+  display: none;
+}
+```
+
+```md
+![Docusaurus themed image](/img/docusaurus_keytar.svg#gh-light-mode-only)![Docusaurus themed image](/img/docusaurus_speed.svg#gh-dark-mode-only)
+```
+
+<BrowserWindow>
+
+![Docusaurus themed image](/img/docusaurus_keytar.svg#gh-light-mode-only)![Docusaurus themed image](/img/docusaurus_speed.svg#gh-dark-mode-only)
+
+</BrowserWindow>
+
+## Static assets {#static-assets}
+
+If a Markdown link or image has an absolute path, the path will be seen as a file path and will be resolved from the static directories. For example, if you have configured [static directories](../../static-assets.md) to be `['public', 'static']`, then for the following image:
+
+```md title="my-doc.md"
+![An image from the static](/img/docusaurus.png)
+```
+
+Docusaurus will try to look for it in both `static/img/docusaurus.png` and `public/img/docusaurus.png`. The link will then be converted to a `require()` call instead of staying as a URL. This is desirable in two regards:
+
+1. You don't have to worry about the base URL, which Docusaurus will take care of when serving the asset;
+2. The image enters Webpack's build pipeline and its name will be appended by a hash, which enables browsers to aggressively cache the image and improves your site's performance.
+
+If you intend to write URLs, you can use the `pathname://` protocol to disable automatic asset linking.
+
+```md
+![banner](pathname:///img/docusaurus-asset-example-banner.png)
+```
+
+This link will be generated as `<img src="/img/docusaurus-asset-example-banner.png" alt="banner" />`, without any processing or file existence checking.

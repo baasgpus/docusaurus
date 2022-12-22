@@ -1,7 +1,25 @@
 ---
-draft: true
+image: ./img/oss_logo.png
 ---
 
-# Another Draft
+# Image tests
 
-This page should only be visible in local development
+import Image from '@theme/IdealImage';
+
+import docusaurusImport from '@site/static/img/docusaurus.png';
+
+export const docusaurusRequire = require('@site/static/img/docusaurus.png');
+
+![URL encoded image](./img/oss_logo%20%282%29.png)
+
+## Regular images
+
+<img src={docusaurusImport} />
+
+<img src={docusaurusRequire.default} />
+
+## Ideal images
+
+<Image img={docusaurusImport} />
+
+<Image img={docusaurusRequire} />

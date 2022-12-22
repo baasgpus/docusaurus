@@ -1,20 +1,56 @@
 ---
+title: Blog post MDX Feed tests
+authors:
+  - slorber
 tags:
   - paginated-tag
-authors:
-  - 
-    name: Josh-Cena1
-  - 
-    name: Josh-Cena2
-    image_url: https://github.com/Josh-Cena.png
-  - 
-    name: Josh-Cena3
-    url: https://github.com/Josh-Cena
-  - 
-    name: Josh-Cena4
-    email: sidechen2003@gmail.com
+  - blog
+  - docusaurus
+  - long-long
+  - long-long-long
+  - long-long-long-long
+hide_reading_time: true
 ---
 
-# Post with duplicate title
+Some MDX tests, mostly to test how the RSS feed render those
 
-See https://github.com/facebook/docusaurus/issues/6059. This one and [2021-11-13-dup-title.md](./2021-11-13-dup-title.md) should both show up.
+<!-- truncate -->
+
+## Imports
+
+Here are some imports:
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+## Exports
+
+Here are some exports:
+
+export const someExport = 42;
+
+## Tabs test
+
+Here are some tabs:
+
+<Tabs>
+  <TabItem value="apple" label="Apple">
+    This is an apple 🍎
+  </TabItem>
+  <TabItem value="orange" label="Orange">
+    This is an orange 🍊
+  </TabItem>
+</Tabs>
+
+Here are some tabs, inside `mdx-code-block`:
+
+```mdx-code-block
+<Tabs>
+  <TabItem value="apple" label="Apple">
+    This is an apple 🍎
+  </TabItem>
+  <TabItem value="orange" label="Orange">
+    This is an orange 🍊
+  </TabItem>
+</Tabs>
+```

@@ -5,103 +5,95 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-import React from 'react';
-import clsx from 'clsx';
-import Link from '@docusaurus/Link';
-import Translate from '@docusaurus/Translate';
-import Image from '@theme/IdealImage';
-import FavoriteIcon from '@site/src/components/svgIcons/FavoriteIcon';
-import {
-  Tags,
-  TagList,
-  type TagType,
-  type User,
-  type Tag,
-} from '@site/src/data/users';
-import {sortBy} from '@site/src/utils/jsUtils';
-import Tooltip from '../ShowcaseTooltip';
-import styles from './styles.module.css';
-
-const TagComp = React.forwardRef<HTMLLIElement, Tag>(
-  ({label, color, description}, ref) => (
-    <li ref={ref} className={styles.tag} title={description}>
-      <span className={styles.textLabel}>{label.toLowerCase()}</span>
-      <span className={styles.colorLabel} style={{backgroundColor: color}} />
-    </li>
-  ),
-);
-
-function ShowcaseCardTag({tags}: {tags: TagType[]}) {
-  const tagObjects = tags.map((tag) => ({tag, ...Tags[tag]}));
-
-  // Keep same order for all tags
-  const tagObjectsSorted = sortBy(tagObjects, (tagObject) =>
-    TagList.indexOf(tagObject.tag),
-  );
-
-  return (
-    <>
-      {tagObjectsSorted.map((tagObject, index) => {
-        const id = `showcase_card_tag_${tagObject.tag}`;
-
-        return (
-          <Tooltip
-            key={index}
-            text={tagObject.description}
-            anchorEl="#__docusaurus"
-            id={id}>
-            <TagComp key={index} {...tagObject} />
-          </Tooltip>
-        );
-      })}
-    </>
-  );
+.showcaseCardImage {
+  overflow: hidden;
+  height: 150px;
+  border-bottom: 2px solid var(--ifm-color-emphasis-200);
 }
 
-function getCardImage(user: User): string {
-  return (
-    user.preview ??
-    `https://slorber-api-screenshot.netlify.app/${encodeURIComponent(
-      user.website,
-    )}/showcase`
-  );
+.showcaseCardHeader {
+  display: flex;
+  align-items: center;
+  margin-bottom: 12px;
 }
 
-function ShowcaseCard({user}: {user: User}) {
-  const image = getCardImage(user);
-  return (
-    <li key={user.title} className="card shadow--md">
-      <div className={clsx('card__image', styles.showcaseCardImage)}>
-        <Image img={image} alt={user.title} />
-      </div>
-      <div className="card__body">
-        <div className={clsx(styles.showcaseCardHeader)}>
-          <h4 className={styles.showcaseCardTitle}>
-            <Link href={user.website} className={styles.showcaseCardLink}>
-              {user.title}
-            </Link>
-          </h4>
-          {user.tags.includes('favorite') && (
-            <FavoriteIcon svgClass={styles.svgIconFavorite} size="small" />
-          )}
-          {user.source && (
-            <Link
-              href={user.source}
-              className={clsx(
-                'button button--secondary button--sm',
-                styles.showcaseCardSrcBtn,
-              )}>
-              <Translate id="showcase.card.sourceLink">source</Translate>
-            </Link>
-          )}
-        </div>
-        <p className={styles.showcaseCardBody}>{user.description}</p>
-      </div>
-      <ul className={clsx('card__footer', styles.cardFooter)}>
-        <ShowcaseCardTag tags={user.tags} />
-      </ul>
-    </li>
-  );
+.showcaseCardTitle {
+  margin-bottom: 0;
+  flex: 1 1 auto;
 }
 
-export default React.memo(ShowcaseCard);
+.showcaseCardTitle a {
+  text-decoration: none;
+  background: linear-gradient(
+      var(--ifm-color-primary),
+      var(--ifm-color-primary)
+    )
+    0% 100% / 0% 1px no-repeat;
+  transition: background-size ease-out 200ms;
+}
+
+.showcaseCardTitle a:not(:focus):hover {
+  background-size: 100% 1px;
+}
+
+.showcaseCardTitle,
+.showcaseCardHeader .svgIconFavorite {
+  margin-right: 0.25rem;
+}
+
+.showcaseCardHeader .svgIconFavorite {
+  color: var(--site-color-svg-icon-favorite);
+}
+
+.showcaseCardSrcBtn {
+  margin-left: 6px;
+  padding-left: 12px;
+  padding-right: 12px;
+  border: none;
+}
+
+.showcaseCardSrcBtn:focus-visible {
+  background-color: var(--ifm-color-secondary-dark);
+}
+
+[data-theme='dark'] .showcaseCardSrcBtn {
+  background-color: var(--ifm-color-emphasis-200) !important;
+  color: inherit;
+}
+
+[data-theme='dark'] .showcaseCardSrcBtn:hover {
+  background-color: var(--ifm-color-emphasis-300) !important;
+}
+
+.showcaseCardBody {
+  font-size: smaller;
+  line-height: 1.66;
+}
+
+.cardFooter {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.tag {
+  font-size: 0.675rem;
+  border: 1px solid var(--ifm-color-secondary-darkest);
+  cursor: default;
+  margin-right: 6px;
+  margin-bottom: 6px !important;
+  border-radius: 12px;
+  display: inline-flex;
+  align-items: center;
+}
+
+.tag .textLabel {
+  margin-left: 8px;
+}
+
+.tag .colorLabel {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  margin-left: 6px;
+  margin-right: 6px;
+}

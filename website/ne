@@ -1,7 +1,3 @@
-{
-  "label": "Category Links",
-  "link": {
-    "type": "generated-index",
-    "slug": "/category-links-generated-index-slug"
-  }
-}
+# Readme
+
+This `readme.md` should not be used as the category index due to the `_category_.json` link

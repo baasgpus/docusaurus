@@ -1,19 +1,11 @@
 ---
-slug: /
 tags:
   - a
-  - b
-  - c
-  - some tag
-unlisted: true #Makes the navbar link disappear in prod
-id: index
-sidebar_label: Docs tests #TODO why is this required?
+  - e
+  - some-tag
+  - some_tag
 ---
 
-# Docs tests
+# Another test page
 
-This Docusaurus docs plugin instance is meant to test fancy edge-cases that regular unit tests don't really cover.
-
-- [/tests/docs](/tests/docs)
-- [/tests/blog](/tests/blog)
-- [/tests/pages](/tests/pages)
+[Test link](./folder%20with%20space/doc%201.md)

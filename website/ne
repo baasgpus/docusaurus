@@ -5,12 +5,6 @@ tags:
   - draft
 ---
 
-# Only Drafts - Subcategory index draft
+# Only Drafts - Draft 1
 
 Doc with draft front matter
-
-```mdx-code-block
-import DocCardList from '@theme/DocCardList';
-
-<DocCardList />
-```

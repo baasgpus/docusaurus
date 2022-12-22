@@ -1,122 +1,28 @@
----
-title: Docusaurus 2.2
-authors:
-  - slorber
-tags:
-  - release
-image: ./img/social-card.png
-date: 2022-10-29
----
+# Support
 
-We are happy to announce **Docusaurus 2.2**.
+Docusaurus has a community of thousands of developers.
 
-The upgrade should be easy: as explained in our [release process documentation](/community/release-process), minor versions respect [Semantic Versioning](https://semver.org/).
+On this page we've listed some Docusaurus-related communities that you can be a part of; see the other pages in this section for additional online and in-person learning materials.
 
-![Docusaurus 2.2 social card](./img/social-card.png)
+Before participating in Docusaurus' communities, [please read our Code of Conduct](https://engineering.fb.com/codeofconduct/). We have adopted the [Contributor Covenant](https://www.contributor-covenant.org/) and we expect that all community members adhere to the guidelines within.
 
-<!--truncate-->
+## Stack Overflow {#stack-overflow}
 
-## Highlights
+Stack Overflow is a popular forum to ask code-level questions or if you're stuck with a specific error. Read through the [existing questions](https://stackoverflow.com/questions/tagged/docusaurus) tagged with **docusaurus** or [ask your own](https://stackoverflow.com/questions/ask?tags=docusaurus)!
 
-### Mermaid diagrams
+## Discussion forums {#discussion-forums}
 
-In [#7490](https://github.com/facebook/docusaurus/pull/7490), we added support for Mermaid diagrams. This fills the gap between GitHub Flavored Markdown which also [added support recently](https://github.blog/2022-02-14-include-diagrams-markdown-files-mermaid/). You can create Mermaid diagrams using Markdown code blocks:
+There are many online forums for discussion about best practices and application architecture as well as the future of Docusaurus. If you have an answerable code-level question, Stack Overflow is usually a better fit.
 
-````md
-```mermaid
-sequenceDiagram
-    participant Alice
-    participant Bob
-    Alice->>John: Hello John, how are you?
-    loop Health check
-        John->>John: Fight against hypochondria
-    end
-    Note right of John: Rational thoughts <br/>prevail!
-    John-->>Alice: Great!
-    John->>Bob: How about you?
-    Bob-->>John: Jolly good!
-```
-````
+- [Docusaurus online chat](https://discord.gg/docusaurus)
+  - [#help-and-questions](https://discord.gg/fwbcrQ3dHR) for user help
+  - [#contributors](https://discord.gg/6g6ASPA) for contributing help
+- [Reddit's Docusaurus community](https://www.reddit.com/r/docusaurus/)
 
-````mdx-code-block
-import BrowserWindow from '@site/src/components/BrowserWindow';
+## Feature requests {#feature-requests}
 
-<BrowserWindow>
+For new feature requests, you can create a post on our [feature requests board (Canny)](/feature-requests), which is a handy tool for road-mapping and allows for sorting by upvotes, which gives the core team a better indicator of what features are in high demand, as compared to GitHub issues which are harder to triage. Refrain from making a Pull Request for new features (especially large ones) as someone might already be working on it or will be part of our roadmap. Talk to us first!
 
-```mermaid
-sequenceDiagram
-    participant Alice
-    participant Bob
-    Alice->>John: Hello John, how are you?
-    loop Health check
-        John->>John: Fight against hypochondria
-    end
-    Note right of John: Rational thoughts <br/>prevail!
-    John-->>Alice: Great!
-    John->>Bob: How about you?
-    Bob-->>John: Jolly good!
-```
+## News {#news}
 
-</BrowserWindow>
-
-````
-Make sure to check the [documentation](/docs/markdown-features/diagrams), and the [more advanced examples](/tests/pages/diagrams)
-### Config `headTags`
-In [#8151](https://github.com/facebook/docusaurus/pull/8151), we added the ability to apply arbitrary HTML `<head>` tags to all pages of your site.
-
-```js title="docusaurus.config.js"
-module.exports = {
-  headTags: [
-    {
-      tagName: 'link',
-      attributes: {
-        rel: 'icon',
-        href: '/img/docusaurus.png',
-      },
-    },
-  ],
-};
-```
-
-### Accessibility
-
-We did several accessibility improvements:
-
-- [#8207](https://github.com/facebook/docusaurus/pull/8207): improves keyboard navigation for mobile drawer hamburger button
-- [#8161](https://github.com/facebook/docusaurus/pull/8161): improves keyboard navigation for tabs
-- [#8204](https://github.com/facebook/docusaurus/pull/8204): makes the skip to content button support progressive enhancement
-- [#8174](https://github.com/facebook/docusaurus/pull/8174): improves screen reader announcement when toggling between light/dark mode
-
-### Developer Experience
-
-We made validation stricter and improved error messages:
-
-- [#8234](https://github.com/facebook/docusaurus/pull/8234): in case of doc processing failure, prints the problematic markdown file path in the error message
-- [#8192](https://github.com/facebook/docusaurus/pull/8192) and [#8159](https://github.com/facebook/docusaurus/pull/8159): validates `siteConfig.url` more strictly and with better error message
-- [#8066](https://github.com/facebook/docusaurus/pull/8066): makes config `url` and `baseUrl` fail-safe and less sensitive to the presence or absence of a leading or trailing slash
-
-### Translations
-
-We completed the default theme translation support for multiple languages:
-
-- 🇹🇷 [#8105](https://github.com/facebook/docusaurus/pull/8105): completes Turkish translations
-- 🇷🇺 [#8253](https://github.com/facebook/docusaurus/pull/8253): completes Russian translations
-- 🇫🇷 [#8243](https://github.com/facebook/docusaurus/pull/8243): completes French translations
-- 🇯🇵 [#8075](https://github.com/facebook/docusaurus/pull/8075): completes Japanese translations
-
-:::tip
-
-Completing theme translations is an [ongoing effort](https://github.com/facebook/docusaurus/issues/3526) and an easy way to contribute to Docusaurus. We add new theme features regularly, for which we often [need new translations](https://github.com/facebook/docusaurus/issues/3526).
-
-:::
-
-## Other changes
-
-Other notable changes include:
-
-- [#8210](https://github.com/facebook/docusaurus/pull/8210): the `docusaurus swizzle` CLI has a new `--config` option
-- [#8109](https://github.com/facebook/docusaurus/pull/8109): mobile navigation performance optimizations, prefetch resources earlier
-- [#8059](https://github.com/facebook/docusaurus/pull/8059): versions/locales navbar dropdowns preserve hash and querystring on navigation
-- [#8227](https://github.com/facebook/docusaurus/pull/8227): the client redirect plugin preserves hash and querystring on redirect
-
-Check the **[2.2.0 changelog entry](/changelog/2.2.0)** for an exhaustive list of changes.
+For the latest news about Docusaurus, [follow **@docusaurus** on Twitter](https://twitter.com/docusaurus) and the [official Docusaurus blog](/blog) on this website.

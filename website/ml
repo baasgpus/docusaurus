@@ -1,10 +1,16 @@
 ---
-draft: true
+unlisted: true
 tags:
   - visibility
-  - draft
+  - unlisted
 ---
 
-# Some Drafts - Draft 2
+# Some Unlisteds - Subcategory index unlisted
 
-Doc with draft front matter
+Doc with unlisted front matter
+
+```mdx-code-block
+import DocCardList from '@theme/DocCardList';
+
+<DocCardList />
+```

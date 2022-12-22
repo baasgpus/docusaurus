@@ -1,127 +1,136 @@
 ---
-title: How I Converted Profilo to Docusaurus in Under 2 Hours
-author: Christine Abernathy
-authorURL: http://twitter.com/abernathyca
-authorImageURL: https://github.com/caabernathy.png
-authorTwitter: abernathyca
+title: Towards Docusaurus 2
+author: Endilie Yacop Sucipto
+authorTitle: Maintainer of Docusaurus
+authorURL: https://github.com/endiliey
+authorImageURL: https://github.com/endiliey.png
+authorTwitter: endiliey
 tags:
-  - profilo
+  - new
   - adoption
 ---
 
-> _“Joel and I were discussing having a website and how it would have been great to launch with it. So I challenged myself to add Docusaurus support. It took just over an hour and a half. I'm going to send you a PR with the addition so you can take a look and see if you like it. Your workflow for adding docs wouldn't be much different from editing those Markdown files.”_
-> 
-> _— Note sent to the Profilo team_
+Docusaurus was [officially announced](https://v1.docusaurus.io/blog/2017/12/14/introducing-docusaurus) over nine months ago as a way to easily build open source documentation websites. Since then, it has amassed over 8,600 GitHub Stars, and is used by many popular open source projects such as [React Native](https://facebook.github.io/react-native/), [Babel](https://babeljs.io/), [Jest](https://jestjs.io/), [Reason](https://reasonml.github.io/) and [Prettier](https://prettier.io/).
 
-This is the story of the rather short journey it took to create the [Profilo](https://facebookincubator.github.io/profilo/) website using Docusaurus.
-
-Profilo, an Android library for collecting performance traces from production, [was announced](https://code.fb.com/android/profilo-understanding-app-performance-in-the-wild/) earlier this year. The project was [published on GitHub](https://github.com/facebookincubator/profilo/tree/802042f90f990998a272387e371b893af52465b8) with a less than [a handful or Markdown files](https://github.com/facebookincubator/profilo/tree/802042f90f990998a272387e371b893af52465b8/docs) to describe its functionality and no website to showcase any branding and highlight the logo. The task at hand was to turn these existing docs and logo into a website.
+There is a saying that the very best software is constantly evolving, and the very worst is not. In case you are not aware, we have been planning and working on the next version of Docusaurus 🎉.
 
 <!--truncate-->
 
-In general, when creating a website with Docusaurus you do the following:
+## Introduction
 
-1. Generate a template website using Docusaurus scripts.
-1. Customize the generated template files for your desired site colors and your project configuration (ex: website and GitHub links).
-1. Create the website content:
-   1. Add your docs and any supporting assets.
-   1. Customize the default landing page provided by Docusaurus to suit your needs.
-   1. Configure the default site navigation file.
-1. Publish the website and set up how it will be published for future changes.
+It all started with this [RFC issue](https://github.com/facebook/docusaurus/issues/789) opened by [Yangshun](https://github.com/yangshun) towards the end of June 2018.
 
-Given I had pre-existing Markdown files, I didn't have to generate the core content but simply make sure that Docusaurus could process the files by adding the expected metadata to them. Most of the work would therefore consist of customizing the defaults provided by Docusaurus.
+<blockquote><h4><a href="https://github.com/facebook/docusaurus/issues/789">[RFC] Docusaurus v2 · Issue #789 · facebook/docusaurus</a></h4><p>These are some of the problems I'm seeing in Docusaurus now and also how we can address them in v2. A number of the ideas here were inspired by VuePress and other static site generators. In the current static site generators ecosystem, t...</p></blockquote>
 
-## Overview of Steps Taken
+Most of the suggested improvements are mentioned in the issue; I will provide details on some of issues in Docusaurus 1 and how we are going to address them in Docusaurus 2.
 
-Here's an overview of the steps taken to convert to a website. I'll discuss some of the design aspects in a later section.
+## Infrastructure
 
-**Design and colors:**
+### Content
 
-1. Got all the desired logo formats from designer. I had to create the _.favicon_ one.
-1. Worked out some passable primary and secondary website colors using the http://paletton.com/ tools - very handy!
+A Docusaurus 1 website is, in fact, built into a bunch of static HTML pages. Despite using React, we were not fully utilizing the features React offered, such as component state, which allows for dynamic and interactive pages. React was only used as a templating engine for static content and interactivity has to be added through script tags and `dangerouslySetInnerHTML` 😱.
 
-**Initial website setup:**
+In addition, there is not an easy way to change how Docusaurus loads content. For example, adding CSS preprocessors such as Sass and Less was not supported natively and involved many user hacks of adding custom scripts.
 
-1. Forked the [Profilo project](https://github.com/facebookincubator/profilo/) on GitHub and created a local clone of the fork to set up the website.
-1. Created the initial Docusaurus website using the [installation instructions](https://v1.docusaurus.io/docs/en/installation.html).
-1. Deleted the `docs-examples-from-docusaurus` and `website/blog-examples-from-docusaurus` folders as these would not be needed. Profilo had existing docs we could use and there was no need for blogs at this time.
+For Docusaurus 2, we will be using [webpack](https://webpack.js.org/) as a module bundler and we are changing the way we serve content. Adding CSS preprocessors will be as easy as adding a webpack loader. Instead of a pure static HTML, **during build time we will create a server-rendered version of the app** and render the corresponding HTML. A Docusaurus site will be essentially an isomorphic/universal application. This approach is heavily inspired by [Gatsby](https://github.com/gatsbyjs/gatsby).
 
-**Content creation:**
+### Versioning
 
-1. Added metadata to the existing Markdown files found in the `docs` folder, for example:
+If you have been using Docusaurus for a while, you might notice that Docusaurus creates versioned docs **if and only if** the docs content are **different**.
 
-   ```md
-   ---
-   id: architecture
-   title: Architecture
-   sidebar_label: Architecture
-   ---
-   ```
+For example, if we have `docs/hello.md`:
 
-2. Added the logo assets to the `website/static/img` folder.
-3. Modified `website/pages/en/index.js`, the landing page, to highlight Profilo features.
-4. Modified `website/core/Footer.js`, the footer, to simplify it for Profilo.
-5. Edited `website/siteConfig.js` (website configuration file) to specify the previously chosen primary and secondary colors.
-6. Modified `website/sidebars.json` that specifies the sidebar navigation. Listed all the docs and customized it based on the metadata added to the Markdown files.
-7. Edited the website configuration file to specify the GitHub properties, logo images, header links, and the website link.
-8. Tested the website locally throughout this phase. (I ran `yarn start` from the `website` folder to start the server.)
+```text
+---
+id: hello
+title: hello
+---
+Hello world !
+```
 
-**Feedback and review changes:**
+And **we cut version 1.0.0,** Docusaurus will create `versioned_docs/version-1.0.0/hello.md`:
 
-1. Sent a [pull request](https://github.com/facebookincubator/profilo/pull/6) to the project.
-2. Updated the colors after the designer rightly gasped at the ones I had chosen (IANAD).
-3. Updated the colors and updated the PR.
-4. The PR was then accepted and [merged](https://github.com/facebookincubator/profilo/commit/6ad033aaf5a7d54e6d842f45a5bccd051a8e45ad). Yay!
+```text
+---
+id: version-1.0.0-hello
+title: hello
+original_id: hello
+---
+Hello world !
+```
 
-**Website publishing:**
+However, if there are no changes to `hello.md` when cutting v2.0.0, Docusaurus will not create any versioned docs for that document. In other words, `versioned_docs/version-2.0.0/hello.md` will not exist.
 
-1. Pushed the first website version by running the Docusaurus publish script from the command line:
+This can be very confusing for users; if they want to edit the v2.0.0 docs, they have to edit `versioned_docs/version-1.0.0/hello.md` or manually add `versioned_docs/version-2.0.0/hello.md`. This could potentially lead to unwanted bugs. Here is a [real scenario in Jest](https://github.com/facebook/jest/pull/6758#issuecomment-408274413).
 
-   ```bash
-   USE_SSH=true \
-     GIT_USER=caabernathy \
-     CURRENT_BRANCH=master \
-     yarn run publish-gh-pages
-   ```
+In addition, this adds complexity within the codebase as we require a mechanism for version fallbacks. And during build time, Docusaurus has to replace the linking to the correct version. This is also the cause of a bug where [renaming docs breaks links in old versions](https://github.com/facebook/docusaurus/issues/845).
 
-2. Configured CircleCI using the [provided Docusaurus instructions](https://v1.docusaurus.io/docs/en/publishing.html#automating-deployments-using-continuous-integration). There were 2 PRs for this, [the first](https://github.com/facebookincubator/profilo/pull/8)for the initial config and [the second](https://github.com/facebookincubator/profilo/pull/12) to make sure CircleCI only triggered for changes in the master branch (thanks Joel Marcey!).
+For Docusaurus 2, **every time we cut a new version, we will instead take a snapshot of all the docs**. We will not require the content of a document to have changed. This is a space complexity trade-off for a better developer and user experience. We will use more space for better separation of concerns and guaranteed correctness.
 
-The final website was published on https://facebookincubator.github.io/profilo/. It had taken 1.5 hours to get to the initial PR stage and another half an hour or so to respond to review feedback and publish the website.
+### Translation
 
-## Design
+Docusaurus allows for easy translation functionality by using [Crowdin](https://crowdin.com/). Documentation files written in English are uploaded to Crowdin for translation by users within a community. We always assumed that **English** is the default language, but this might not be the case for all users. We have seen plenty of non-English open source projects using Docusaurus.
 
-Here's what the initial website looked like when the first pull request was sent out:
+For Docusaurus 2, **we will not assume English is the default language**. When a user enables internationalization, they have to set a default language in `siteConfig.js`. We will then assume that all the files in `docs` are written in that language.
 
-![The website's front page, with a quite bright and saturated red color as the primary color, closely resembling the Profilo logo color, making the logo unrecognizable in the navbar](/img/profilo_blog_post_website_initial.png)
+In addition, after working on the MVP of Docusaurus 2, I realized that it is possible not to use Crowdin for translations. Thus, we might need to add an additional workflow to enable that scenario. However, we will still strongly recommend people use Crowdin for easier integration.
 
-Most of the time in the content creation was spent picking colors that worked reasonably well with the given logo. These colors were a good jumping off point for designer feedback. I used Photoshop to sample various portions of the logo.
+## Customizability
 
-![Picking colors in Photoshop, with the Profilo logo and the main working area in the background and a color picker dialog in the foreground, selected to a red shade](/img/profilo_blog_post_photoshop_color_picker.png)
+### Layout
 
-I then took the RGB representation of the color and set it as the baseline color on [Paletton](http://paletton.com/). The website then gave me various color options to try on the website by editing the Docusaurus website configuration file.
+The current state of Docusaurus is that it is in charge of the entire layout and styling, unintentionally making it very hard for users to customize their site's appearance to their wishes.
 
-![Using Paletton to generate a full palette from the red shade selected. There's a color wheel showing all hues on the left, and a square showing various shades of red on the right.](/img/profilo_blog_post_palette_website_color_picker.png)
+For Docusaurus 2, **layout and styling should be controlled by the user**. Docusaurus will handle the content generation, routing, translation, and versioning. Inspired by [create-react-app](https://github.com/facebook/create-react-app) and [VuePress](https://vuepress.vuejs.org/), Docusaurus will still provide a default theme, which the user can eject from, for further layout and styling customization. This means that it is very possible for the user to even change the HTML meta by using [React Helmet](https://github.com/nfl/react-helmet). Community-based themes are also very possible. This approach of allowing users to be in charge of layout and styling is taken by most static site generators.
 
-The selected primary and secondary colors were a good jumping off point for designer feedback.
+### Markdown
 
-There were also modifications made to the default website generated by Docusaurus. These changes were mainly around simplifying the footer and creating a customized landing page for Profilo that listed the project's features.
+Our Markdown parsing is currently powered by [Remarkable](https://github.com/jonschlinkert/remarkable). What if the user wants to use [Markdown-it](https://github.com/Markdown-it/Markdown-it) or even [MDX](https://github.com/mdx-js/mdx)? And then there is an issue of which syntax highlighter to use, (e.g: [Prism](https://prismjs.com/) vs [Highlight.js](https://highlightjs.org/)). We should leave these choices open to the user.
 
-Here's what the final website looked like:
+For Docusaurus 2, **users can eject and choose their own Markdown parser**. It does not matter if they want to use another Markdown parser such as [Remark](https://github.com/remarkjs/remark), or even their own in-house Markdown parser. As a rule of thumb, the user has to provide a React component, in which we will provide a children props containing the _RAW string of Markdown_. By default, we will use Remarkable for the Markdown parser and Highlight.js for the syntax highlighting. The default parser could still change in the future as we're still experimenting with different Markdown parsers.
 
-![The website's front page, with a much darker red color as the primary color, making both the logo and the primary-colored title text clearly legible.](/img/profilo_blog_post_website_final.png)
+### Search
 
-This is an example page showing the core content, in this case the Getting Started page:
+Our core search functionality is based on [Algolia](https://www.algolia.com/). There are requests by users to be able to use different search offerings, such as `lunrjs` for offline search.
 
-![A doc page with the sidebar on the left quarter of the screen and the main content occupying the rest. Some text is using the primary color and the main body uses multiple kinds of typesetting including bold, list, and code](/img/profilo_blog_post_website_final_docs.png)
+I personally like Algolia and we have a great experience working with them. They are very responsive; we can easily submit a pull request to Algolia since their `DocSearch` is open source. For example, I recently submitted [this PR that enables DocSearch to scrape alternate languages in sitemap](https://github.com/algolia/docsearch-scraper/pull/387).
 
-This also shows the sidebar structure that was set up through editing `website/sidebars.json`.
+For Docusaurus 2, **we will allow users to customize the search box**. Users simply need to eject from the default theme and modify the Search UI (a React component). However, we will still use Algolia in the default theme.
 
-Lastly, I didn't have to worry about handling responsive design. You get this out of the box with Docusaurus!
+## Stability
 
-![Mobile screenshots of the front page and sample doc page. The layout is automatically adjusted to make it appear more natural. The doc sidebar is hidden behind a button.](/img/profilo_blog_post_android_ios.png)
+Software is never going to be perfect, but we want Docusaurus to not break as we add new features. When Docusaurus was first released, it did not have any strong automated test suites. As a result, there were a lot of regressions not caught early. Although we have recently added a lot of tests, the test coverage is still relatively low.
+
+For Docusaurus 2, **we are adding tests as we develop** since we are going for a fresh rewrite. Hence, I believe that it should be more stable than ever and it should be harder to break things compared to Docusaurus 1.
+
+## Frequently Asked Questions
+
+### Will there be any breaking changes?
+
+If you've read the post up until to this point, you should be able to notice that there will be breaking changes. While we will try to **minimize the number of breaking changes** and make it backward compatible as much as possible, we believe that some breaking changes are required. This is mostly due to Docusaurus 2 being a **major rewrite and re-architecting** of the codebase.
+
+The exact list of breaking changes is not totally known yet as development is not 100% finalized. However, one thing that I will highlight is that we will deprecate a lot of options in `siteConfig.js` and we plan to keep it as lean as possible. For example, the `cleanUrl` siteConfig will be deprecated as all the URL for Docusaurus 2 sites will be without the `.html` suffix.
+
+Our goal is that most sites should be able to upgrade to Docusaurus 2 without a lot of pain. We will also include a migration guide when we release Docusaurus 2. When the times come, feel free to ping us on [Discord](https://discord.gg/docusaurus) or [Twitter](https://twitter.com/docusaurus) for questions and help.
+
+### When is the release of Docusaurus 2?
+
+As of now, we do not have an exact date planned for the release. I personally estimate that we might be able to release an alpha version in the next one to two months, but this is, of course, just an estimate.
+
+One thing that I would like to share is that while Docusaurus is part of [Facebook Open Source](https://opensource.fb.com/) and most of the team are Facebook employees, the maintenance and development work is mostly done outside of normal working hours. I am currently a final year undergraduate student at [NTU Singapore](https://twitter.com/NTUsg), so I had to juggle between doing my coursework, my final year project and maintaining/developing Docusaurus. However, that does not mean that we do not want to make Docusaurus better. In fact, **we want to make it as awesome as possible**.
+
+For now, the actual Docusaurus 2 work is still hosted in a private repository. In the near future, we will move them into the [public repository](https://github.com/facebook/docusaurus). When that time arrives, I encourage everyone to look into it and hopefully contribute in some way. Before then, please stay tuned 😉!
 
 ## Final Thoughts
 
-The Profilo engineers were happy to see that they didn't have to change their workflow to update existing content. They were able to continue working with Markdown files. This will still be true in the future if new docs are added, although there may be some config changes needed if the sidebar navigation needs to be updated.
+Docusaurus has had a large impact on the open source community as seen from the [many popular projects](https://v1.docusaurus.io/en/users) which use Docusaurus for documentation. In order to move faster in the future, we are taking the opportunity to fix some core problems with Docusaurus 1 and striving to make Docusaurus better for everyone. In fact, it is safe to say that Docusaurus 2 is not just a plan any longer; the work on it has started and, hopefully, we will be able to see it materialize in the near future.
 
-The infrastructure provided by Docusaurus made it easy to convert Markdown files into a working website. Even though the project had only three docs, this gave Profilo a more professional look. So, it was well worth the short time investment to get it done.
+Docusaurus' mission has always been to make it really easy for you to get a website with documentation up and running out of the box. That mission does not change with Docusaurus 2.
+
+We also want to let people know that **due to work on Docusaurus 2, we will be less likely to accept new features/major changes on Docusaurus 1.**
+
+If you are using Docusaurus, you are part of our community; keep letting us know how we can make Docusaurus better for you. If you appreciate the work we're doing, you can support [Docusaurus on Open Collective](https://opencollective.com/Docusaurus).
+
+> If you are sponsoring our work on [Open Collective](https://opencollective.com/Docusaurus), we'll personally offer you a helping hand for maintenance and upgrading of Docusaurus website.
+
+Lastly, if you haven't done so already, click the **star** and **watch** button on [GitHub](https://github.com/facebook/docusaurus), and follow us on [Twitter](https://twitter.com/docusaurus).

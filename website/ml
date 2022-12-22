@@ -1,1 +1,6 @@
-This is a blog partial
+slorber:
+  name: Sebastien Lorber
+  title: Docusaurus maintainer
+  url: https://sebastienlorber.com
+  image_url: https://github.com/slorber.png
+  twitter: sebastienlorber

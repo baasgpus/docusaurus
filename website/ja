@@ -1,216 +1,206 @@
 ---
-description: How to install Docusaurus locally, and start a Docusaurus site in no time.
+description: Docusaurus was designed from the ground up to be easily installed and used to get your website up and running quickly.
+slug: /
 ---
 
-# Installation
+# Introduction
 
-```mdx-code-block
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
-```
+⚡️ Docusaurus will help you ship a **beautiful documentation site in no time**.
 
-Docusaurus is essentially a set of npm [packages](https://github.com/facebook/docusaurus/tree/main/packages).
+💸 Building a custom tech stack is expensive. Instead, **focus on your content** and just write Markdown files.
 
-:::tip
+💥 Ready for more? Use **advanced features** like versioning, i18n, search and theme customizations.
 
-Use the **[Fast Track](introduction.md#fast-track)** to understand Docusaurus in **5 minutes ⏱**!
+💅 Check the **[best Docusaurus sites](/showcase?tags=favorite)** for inspiration and read some **[testimonials](https://twitter.com/sebastienlorber/timelines/1392048416872706049)**.
 
-Use **[docusaurus.new](https://docusaurus.new)** to test Docusaurus immediately in your browser!
+🧐 Docusaurus is a **static-site generator**. It builds a **single-page application** with fast client-side navigation, leveraging the full power of **React** to make your site interactive. It provides out-of-the-box **documentation features** but can be used to create **any kind of site** (personal website, product, blog, marketing landing pages, etc).
 
-:::
+![](/img/slash-introducing.svg)
 
-## Requirements {#requirements}
+## Fast Track ⏱️ {#fast-track}
 
-- [Node.js](https://nodejs.org/en/download/) version 16.14 or above (which can be checked by running `node -v`). You can use [nvm](https://github.com/nvm-sh/nvm) for managing multiple Node versions on a single machine installed.
-  - When installing Node.js, you are recommended to check all checkboxes related to dependencies.
+Understand Docusaurus in **5 minutes** by playing!
 
-## Scaffold project website {#scaffold-project-website}
+Create a new Docusaurus site and follow the **very short** embedded tutorial.
 
-The easiest way to install Docusaurus is to use the command line tool that helps you scaffold a skeleton Docusaurus website. You can run this command anywhere in a new empty repository or within an existing repository, it will create a new directory containing the scaffolded files.
+Install [Node.js](https://nodejs.org/en/download/) and create a new Docusaurus site:
 
 ```bash
 npx create-docusaurus@latest my-website classic
 ```
 
-We recommend the `classic` template so that you can get started quickly, and it contains features found in Docusaurus 1. The `classic` template contains `@docusaurus/preset-classic` which includes standard documentation, a blog, custom pages, and a CSS framework (with dark mode support). You can get up and running extremely quickly with the classic template and customize things later on when you have gained more familiarity with Docusaurus.
-
-You can also use the template's TypeScript variant by passing the `--typescript` flag. See [TypeScript support](./typescript-support.md) for more information.
+Start the site:
 
 ```bash
-npx create-docusaurus@latest my-website classic --typescript
-```
-
-:::info FB-Only
-
-If you are setting up a new Docusaurus website for a Facebook open source project, use the `facebook` template instead, which comes with some useful Facebook-specific defaults:
-
-```bash
-npx create-docusaurus@latest my-website facebook
-```
-
-:::
-
-<details>
-  <summary>Alternative installation commands</summary>
-
-You can also initialize a new project using your preferred project manager:
-
-```mdx-code-block
-<Tabs>
-<TabItem value="npm">
-```
-
-```bash
-npm init docusaurus
-```
-
-```mdx-code-block
-</TabItem>
-<TabItem value="yarn">
-```
-
-```bash
-yarn create docusaurus
-```
-
-```mdx-code-block
-</TabItem>
-<TabItem value="pnpm">
-```
-
-```bash
-pnpm create docusaurus
-```
-
-```mdx-code-block
-</TabItem>
-</Tabs>
-```
-
-</details>
-
-Run `npx create-docusaurus@latest --help`, or check out its [API docs](./api/misc/create-docusaurus.md) for more information about all available flags.
-
-## Project structure {#project-structure}
-
-Assuming you chose the classic template and named your site `my-website`, you will see the following files generated under a new directory `my-website/`:
-
-```bash
-my-website
-├── blog
-│   ├── 2019-05-28-hola.md
-│   ├── 2019-05-29-hello-world.md
-│   └── 2020-05-30-welcome.md
-├── docs
-│   ├── doc1.md
-│   ├── doc2.md
-│   ├── doc3.md
-│   └── mdx.md
-├── src
-│   ├── css
-│   │   └── custom.css
-│   └── pages
-│       ├── styles.module.css
-│       └── index.js
-├── static
-│   └── img
-├── docusaurus.config.js
-├── package.json
-├── README.md
-├── sidebars.js
-└── yarn.lock
-```
-
-### Project structure rundown {#project-structure-rundown}
-
-- `/blog/` - Contains the blog Markdown files. You can delete the directory if you've disabled the blog plugin, or you can change its name after setting the `path` option. More details can be found in the [blog guide](blog.mdx)
-- `/docs/` - Contains the Markdown files for the docs. Customize the order of the docs sidebar in `sidebars.js`. You can delete the directory if you've disabled the docs plugin, or you can change its name after setting the `path` option. More details can be found in the [docs guide](./guides/docs/docs-introduction.md)
-- `/src/` - Non-documentation files like pages or custom React components. You don't have to strictly put your non-documentation files here, but putting them under a centralized directory makes it easier to specify in case you need to do some sort of linting/processing
-  - `/src/pages` - Any JSX/TSX/MDX file within this directory will be converted into a website page. More details can be found in the [pages guide](guides/creating-pages.md)
-- `/static/` - Static directory. Any contents inside here will be copied into the root of the final `build` directory
-- `/docusaurus.config.js` - A config file containing the site configuration. This is the equivalent of `siteConfig.js` in Docusaurus v1
-- `/package.json` - A Docusaurus website is a React app. You can install and use any npm packages you like in them
-- `/sidebars.js` - Used by the documentation to specify the order of documents in the sidebar
-
-### Monorepos {#monorepos}
-
-If you are using Docusaurus for documentation of an existing project, a monorepo may be the solution for you. Monorepos allow you to share dependencies between similar projects. For example, your website may use your local packages to showcase the latest features, instead of depending on a released version; your contributors can also conveniently update the docs as they implement features. An example monorepo folder structure is below:
-
-```bash
-my-monorepo
-├── package-a # Another package, your actual project
-│   ├── src
-│   └── package.json # Package A's dependencies
-├── website   # Docusaurus root
-│   ├── docs
-│   ├── src
-│   └── package.json # Docusaurus' dependencies
-├── package.json # Monorepo's shared dependencies
-```
-
-In this case, you should run `npx create-docusaurus` within the `./my-monorepo` folder.
-
-If you're using a hosting provider such as Netlify or Vercel, you will need to change the `Base directory` of the site to where your Docusaurus root is. In this case, that would be `./website`. Read more about configuring ignore commands in the [deployment docs](./deployment.mdx#deploying-to-netlify).
-
-Read more about monorepos in the [Yarn documentation](https://yarnpkg.com/features/workspaces) (Yarn is not the only way to set up a monorepo, but it's a common solution), or checkout [Docusaurus](https://github.com/facebook/docusaurus) and [Jest](https://github.com/facebook/jest) for some real-world examples.
-
-## Running the development server {#running-the-development-server}
-
-To preview your changes as you edit the files, you can run a local development server that will serve your website and reflect the latest changes.
-
-```bash npm2yarn
 cd my-website
-npm run start
+npx docusaurus start
 ```
 
-By default, a browser window will open at http://localhost:3000.
-
-Congratulations! You have just created your first Docusaurus site! Browse around the site to see what's available.
-
-## Build {#build}
-
-Docusaurus is a modern static website generator so we need to build the website into a directory of static contents and put it on a web server so that it can be viewed. To build the website:
-
-```bash npm2yarn
-npm run build
-```
-
-and contents will be generated within the `/build` directory, which can be copied to any static file hosting service like [GitHub pages](https://pages.github.com/), [Vercel](https://vercel.com/) or [Netlify](https://www.netlify.com/). Check out the docs on [deployment](deployment.mdx) for more details.
-
-## Updating your Docusaurus version {#updating-your-docusaurus-version}
-
-There are many ways to update your Docusaurus version. One guaranteed way is to manually change the version number in `package.json` to the desired version. Note that all `@docusaurus/`-namespaced packages should be using the same version.
-
-import UpgradeGuide from '@site/src/components/UpgradeGuide';
-
-<UpgradeGuide />
-
-Then, in the directory containing `package.json`, run your package manager's install command:
-
-```bash npm2yarn
-npm install
-```
-
-To check that the update occurred successfully, run:
-
-```bash npm2yarn
-npx docusaurus --version
-```
-
-You should see the correct version as output.
-
-Alternatively, if you are using Yarn, you can do:
-
-```bash
-yarn upgrade @docusaurus/core@latest @docusaurus/preset-classic@latest
-```
+Open [http://localhost:3000](http://localhost:3000) and follow the tutorial.
 
 :::tip
 
-Use new unreleased features of Docusaurus with the [`@canary` npm dist tag](/community/canary)
+Use **[docusaurus.new](https://docusaurus.new)** to test Docusaurus immediately in your browser!
+
+Or read the **[5-minute tutorial](https://tutorial.docusaurus.io)** online.
 
 :::
 
-## Problems? {#problems}
+## Docusaurus: Documentation Made Easy
 
-Ask for help on [Stack Overflow](https://stackoverflow.com/questions/tagged/docusaurus), on our [GitHub repository](https://github.com/facebook/docusaurus), our [Discord server](https://discordapp.com/invite/docusaurus), or [Twitter](https://twitter.com/docusaurus).
+In this presentation at [Algolia Community Event](https://www.algolia.com/), [Meta Open Source team](https://opensource.facebook.com/) shared a brief walk-through of Docusaurus. They covered how to get started with the project, enable plugins, and set up functionalities like documentation and blogging.
+
+```mdx-code-block
+import LiteYouTubeEmbed from 'react-lite-youtube-embed';
+
+<div className="video-container">
+  <LiteYouTubeEmbed
+    // cSpell:ignore Yhyx Sksg
+    id="Yhyx7otSksg"
+    params="autoplay=1&autohide=1&showinfo=0&rel=0"
+    title="Docusaurus: Documentation Made Easy"
+    poster="maxresdefault"
+    webp
+  />
+</div>
+```
+
+## Migrating from v1 {#migrating-from-v1}
+
+Docusaurus v2 has been a total rewrite from Docusaurus v1, taking advantage of a completely modernized toolchain. After [v2's official release](https://docusaurus.io/blog/2022/08/01/announcing-docusaurus-2.0), we highly encourage you to **use Docusaurus v2 over Docusaurus v1**, as Docusaurus v1 has been deprecated.
+
+A [lot of users](/showcase) are already using Docusaurus v2 ([trends](https://www.npmtrends.com/docusaurus-vs-@docusaurus/core)).
+
+**Use Docusaurus v2 if:**
+
+- :white_check_mark: You want a modern Jamstack documentation site
+- :white_check_mark: You want a single-page application (SPA) with client-side routing
+- :white_check_mark: You want the full power of React and MDX
+- :white_check_mark: You do not need support for IE11
+
+**Use [Docusaurus v1](https://v1.docusaurus.io/) if:**
+
+- :x: You don't want a single-page application (SPA)
+- :x: You need support for IE11 (...do you? IE [has already reached end-of-life](https://docs.microsoft.com/en-us/lifecycle/products/internet-explorer-11) and is no longer officially supported)
+
+For existing v1 users that are seeking to upgrade to v2, you can follow our [migration guide](./migration/migration-overview.md).
+
+## Features {#features}
+
+Docusaurus is built with high attention to the developer and contributor experience.
+
+- ⚛️ **Built with 💚 and React**:
+  - Extend and customize with React
+  - Gain full control of your site's browsing experience by providing your own React components
+- **Pluggable**:
+  - Bootstrap your site with a basic template, then use advanced features and plugins
+  - Open source your plugins to share with the community
+- ✂️ **Developer experience**:
+  - Start writing your docs right now
+  - Universal configuration entry point to make it more maintainable by contributors
+  - Hot reloading with lightning-fast incremental build on changes
+  - Route-based code and data splitting
+  - Publish to GitHub Pages, Netlify, Vercel, and other deployment services with ease
+
+Our shared goal—to help your users quickly find what they need and understand your products better. We share our best practices to help you build your docs site right and well.
+
+- 🎯 **SEO friendly**:
+  - HTML files are statically generated for every possible path.
+  - Page-specific SEO to help your users land on your official docs directly relating their problems at hand.
+- 📝 **Powered by MDX**:
+  - Write interactive components via JSX and React embedded in Markdown.
+  - Share your code in live editors to get your users to love your products on the spot.
+- 🔍 **Search**: Your full site is searchable.
+- 💾 **Document Versioning**: Helps you keep documentation in sync with project releases.
+- 🌍 **Internationalization (i18n)**: Translate your site in multiple locales.
+
+Docusaurus 2 is born to be compassionately accessible to all your users, and lightning-fast.
+
+- ⚡️ **Lightning-fast**. Docusaurus 2 follows the [PRPL Pattern](https://developers.google.com/web/fundamentals/performance/prpl-pattern/) that makes sure your content loads blazing fast.
+- 🦖 **Accessible**. Attention to accessibility, making your site equally accessible to all users.
+
+## Design principles {#design-principles}
+
+- **Little to learn**. Docusaurus should be easy to learn and use as the API is quite small. Most things will still be achievable by users, even if it takes them more code and more time to write. Not having abstractions is better than having the wrong abstractions, and we don't want users to have to hack around the wrong abstractions. Mandatory talk—[Minimal API Surface Area](https://www.youtube.com/watch?v=4anAwXYqLG8).
+- **Intuitive**. Users will not feel overwhelmed when looking at the project directory of a Docusaurus project or adding new features. It should look intuitive and easy to build on top of, using approaches they are familiar with.
+- **Layered architecture**. The separations of concerns between each layer of our stack (content/theming/styling) should be clear—well-abstracted and modular.
+- **Sensible defaults**. Common and popular performance optimizations and configurations will be done for users but they are given the option to override them.
+- **No vendor lock-in**. Users are not required to use the default plugins or CSS, although they are highly encouraged to. Certain core infrastructures like React Loadable and React Router cannot be swapped because we do default performance optimization on them, but not higher-level ones. Choice of Markdown engines, CSS frameworks, CSS methodology, and other architectures will be entirely up to users.
+
+We believe that, as developers, knowing how a library works helps us become better at using it. Hence we're dedicating effort to explaining the architecture and various components of Docusaurus with the hope that users reading it will gain a deeper understanding of the tool and be even more proficient in using it.
+
+
+<!--
+
+Explain the principles that guide the development of Docusaurus.
+
+References
+---
+- https://www.gatsbyjs.org/docs/behind-the-scenes/
+- https://reactjs.org/docs/design-principles.html
+- https://v1.vuepress.vuejs.org/miscellaneous/design-concepts.html
+
+-->
+
+## Comparison with other tools {#comparison-with-other-tools}
+
+Across all static site generators, Docusaurus has a unique focus on documentation sites and has many out-of-the-box features.
+
+We've also studied other main static site generators and would like to share our insights on the comparison, hopefully helping you navigate through the prismatic choices out there.
+
+### Gatsby {#gatsby}
+
+[Gatsby](https://www.gatsbyjs.com/) is packed with a lot of features, has a rich ecosystem of plugins, and is capable of doing everything that Docusaurus does. Naturally, that comes at a cost of a higher learning curve. Gatsby does many things well and is suitable for building many types of websites. On the other hand, Docusaurus tries to do one thing super well - be the best tool for writing and publishing content.
+
+GraphQL is also pretty core to Gatsby, although you don't necessarily need GraphQL to build a Gatsby site. In most cases when building static websites, you won't need the flexibility that GraphQL provides.
+
+Many aspects of Docusaurus 2 were inspired by the best things about Gatsby and it's a great alternative.
+
+[Docz](https://github.com/pedronauck/docz) is a Gatsby theme to build documentation websites. It is currently less featured than Docusaurus.
+
+### Next.js {#nextjs}
+
+[Next.js](https://nextjs.org/) is another very popular hybrid React framework. It can help you build a good documentation website, but it is not opinionated toward the documentation use-case, and it will require a lot more work to implement what Docusaurus provides out-of-the-box.
+
+[Nextra](https://github.com/shuding/nextra) is an opinionated static site generator built on top of Next.js. It is currently less featured than Docusaurus.
+
+### VuePress {#vuepress}
+
+[VuePress](https://vuepress.vuejs.org/) has many similarities with Docusaurus - both focus heavily on content-centric website and provides tailored documentation features out of the box. However, VuePress is powered by Vue, while Docusaurus is powered by React. If you want a Vue-based solution, VuePress would be a decent choice.
+
+### MkDocs {#mkdocs}
+
+[MkDocs](https://www.mkdocs.org/) is a popular Python static site generator with value propositions similar to Docusaurus.
+
+It is a good option if you don't need a single-page application and don't plan to leverage React.
+
+[Material for MkDocs](https://squidfunk.github.io/mkdocs-material/) is a beautiful theme.
+
+### Docsify {#docsify}
+
+[Docsify](https://docsify.js.org/) makes it easy to create a documentation website, but is not a static-site generator and is not SEO friendly.
+
+### GitBook {#gitbook}
+
+[GitBook](https://www.gitbook.com/) has a very clean design and has been used by many open source projects. With its focus shifting towards a commercial product rather than an open-source tool, many of its requirements no longer fit the needs of open source projects' documentation sites. As a result, many have turned to other products. You may read about Redux's switch to Docusaurus [here](https://github.com/reduxjs/redux/issues/3161).
+
+Currently, GitBook is only free for open-source and non-profit teams. Docusaurus is free for everyone.
+
+### Jekyll {#jekyll}
+
+[Jekyll](https://github.com/jekyll/jekyll) is one of the most mature static site generators around and has been a great tool to use — in fact, before Docusaurus, most of Facebook's Open Source websites are/were built on Jekyll! It is extremely simple to get started. We want to bring a similar developer experience as building a static site with Jekyll.
+
+In comparison with statically generated HTML and interactivity added using `<script />` tags, Docusaurus sites are React apps. Using modern JavaScript ecosystem tooling, we hope to set new standards on doc sites' performance, asset building pipeline and optimizations, and ease to set up.
+
+## Staying informed {#staying-informed}
+
+- [GitHub](https://github.com/facebook/docusaurus)
+- [Twitter](https://twitter.com/docusaurus)
+- [Blog](/blog)
+- [Discord](https://discord.gg/docusaurus)
+
+## Something missing? {#something-missing}
+
+If you find issues with the documentation or have suggestions on how to improve the documentation or the project in general, please [file an issue](https://github.com/facebook/docusaurus) for us, or send a tweet mentioning the [@docusaurus](https://twitter.com/docusaurus) Twitter account.
+
+For new feature requests, you can create a post on our [feature requests board (Canny)](/feature-requests), which is a handy tool for road-mapping and allows for sorting by upvotes, which gives the core team a better indicator of what features are in high demand, as compared to GitHub issues which are harder to triage. Refrain from making a Pull Request for new features (especially large ones) as someone might already be working on it or will be part of our roadmap. Talk to us first!

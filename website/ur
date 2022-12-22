@@ -1,10 +1,10 @@
 ---
-unlisted: true
+draft: true
 tags:
   - visibility
-  - unlisted
+  - draft
 ---
 
-# Only Unlisteds - Unlisted 2
+# Some Drafts - Draft 3
 
-Doc with unlisted front matter
+Doc with draft front matter

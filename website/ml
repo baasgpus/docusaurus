@@ -1,11 +1,16 @@
 ---
-title: Draft blog post
-draft: true
+title: A post with html slug
 tags:
-  - blog
-  - visibility
-  - draft
-slug: /draft-post
+  - paginated-tag
+slug: /x/y/z.html
 ---
 
-This draft blog post should not be accessible in production, only in dev!
+# Hmmm!
+
+This is a blog post with an html slug!
+
+```mdx-code-block
+import Partial from "./_partial.mdx"
+
+<Partial />
+```

@@ -1,56 +1,20 @@
 ---
-title: Blog post MDX Feed tests
+title: Blog post MDX require Feed tests
 authors:
   - slorber
-tags:
-  - paginated-tag
-  - blog
-  - docusaurus
-  - long-long
-  - long-long-long
-  - long-long-long-long
-hide_reading_time: true
+tags: '[ paginated-tag, blog, docusaurus, long-long, long-long-long, long-long-long-long, ] ---'
 ---
 
 Some MDX tests, mostly to test how the RSS feed render those
 
 <!-- truncate -->
 
-## Imports
+Test MDX with require calls
 
-Here are some imports:
+import useBaseUrl from '@docusaurus/useBaseUrl';
 
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
+<img src={useBaseUrl('/img/docusaurus.png')} />
 
-## Exports
+<img src={require('../../static/img/docusaurus.png').default} />
 
-Here are some exports:
-
-export const someExport = 42;
-
-## Tabs test
-
-Here are some tabs:
-
-<Tabs>
-  <TabItem value="apple" label="Apple">
-    This is an apple 🍎
-  </TabItem>
-  <TabItem value="orange" label="Orange">
-    This is an orange 🍊
-  </TabItem>
-</Tabs>
-
-Here are some tabs, inside `mdx-code-block`:
-
-```mdx-code-block
-<Tabs>
-  <TabItem value="apple" label="Apple">
-    This is an apple 🍎
-  </TabItem>
-  <TabItem value="orange" label="Orange">
-    This is an orange 🍊
-  </TabItem>
-</Tabs>
-```
+<img src={require('@site/static/img/docusaurus.png').default} />

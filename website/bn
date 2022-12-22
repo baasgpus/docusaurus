@@ -1,7 +1,7 @@
 ---
-displayed_sidebar: anotherSidebar
+last_update:
+  author: custom author
+  date: 1/1/2000
 ---
 
-# Doc with another sidebar
-
-My link appears in a sidebar, but I want to display another sidebar...
+# Doc With Last Update Front Matter

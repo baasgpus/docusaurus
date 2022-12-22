@@ -5,12 +5,6 @@ tags:
   - unlisted
 ---
 
-# Only Unlisteds - Subcategory index unlisted
+# Only Unlisteds - Unlisted 3
 
 Doc with unlisted front matter
-
-```mdx-code-block
-import DocCardList from '@theme/DocCardList';
-
-<DocCardList />
-```

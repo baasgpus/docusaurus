@@ -1,10 +1,22 @@
----
-toc_min_heading_level: 2
-toc_max_heading_level: 4
----
+# Tabs tests
 
-import Content, { toc as ContentToc, } from '@site/_dogfooding/_partials/toc-tests.md';
+```mdx-code-block
+import BrowserWindow from '@site/src/components/BrowserWindow';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+```
 
-<Content />
+## Tabs with dynamic default value
 
-export const toc = ContentToc;
+This can cause [bugs](https://github.com/facebook/react-native-website/issues/2771) when default value is different between SSR and client:
+
+```mdx-code-block
+export const isMacOS = typeof window !== 'undefined' && navigator.platform.startsWith('Mac');
+
+<BrowserWindow>
+  <Tabs defaultValue={isMacOS ? "ios" : "android"}>
+    <TabItem value="android" label="Android">Android content</TabItem>
+    <TabItem value="ios" label="iOS">iOS content</TabItem>
+  </Tabs>
+</BrowserWindow>
+```

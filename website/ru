@@ -1,69 +1,146 @@
----
-sidebar_position: 2
-slug: /api/misc/@docusaurus/logger
----
+# Plugin Method References
 
-# 📦 logger
+:::caution
 
-An encapsulated logger for semantically formatting console messages.
-
-Authors of packages in the Docusaurus ecosystem are encouraged to use this package to provide unified log formats.
-
-## APIs
-
-It exports a single object as default export: `logger`. `logger` has the following properties:
-
-- Some useful colors.
-  - `red`
-  - `yellow`
-  - `green`
-  - `bold`
-  - `dim`
-- Formatters. These functions all have the signature `(msg: unknown) => string`. Note that their implementations are not guaranteed. You should only care about their semantics.
-  - `path`: formats a file path.
-  - `url`: formats a URL.
-  - `name`: formats an identifier.
-  - `code`: formats a code snippet.
-  - `subdue`: subdues the text.
-  - `num`: formats a number.
-- The `interpolate` function. It is a template literal tag. The syntax can be found below.
-- Logging functions. All logging functions can both be used as normal functions (similar to the `console.log` family, but only accepts one parameter) or template literal tags.
-  - `info`: prints information.
-  - `warn`: prints a warning that should be paid attention to.
-  - `error`: prints an error (not necessarily halting the program) that signals significant problems.
-  - `success`: prints a success message.
-- The `report` function. It takes a `ReportingSeverity` value (`ignore`, `log`, `warn`, `throw`) and reports a message according to the severity.
-
-:::caution A word on the `error` formatter
-
-Beware that an `error` message, even when it doesn't hang the program, is likely going to cause confusion. When users inspect logs and find an `[ERROR]`, even when the build succeeds, they will assume something is going wrong. Use it sparingly.
-
-Docusaurus only uses `logger.error` when printing messages immediately before throwing an error, or when user has set the reporting severity of `onBrokenLink`, etc. to `"error"`.
-
-In addition, `warn` and `error` will color the **entire** message for better attention. If you are printing large blocks of help text about an error, better use `logger.info`.
+This section is a work in progress. Anchor links or even URLs are not guaranteed to be stable.
 
 :::
 
-### Using the template literal tag
+Plugin APIs are shared by themes and plugins—themes are loaded just like plugins.
 
-The template literal tag evaluates the template and expressions embedded. `interpolate` returns a new string, while other logging functions prints it. Below is a typical usage:
+## Plugin module {#plugin-module}
 
-```js
-logger.info`Hello name=${name}! You have number=${money} dollars. Here are the ${
-  items.length > 1 ? 'items' : 'item'
-} on the shelf: ${items}
-To buy anything, enter code=${'buy x'} where code=${'x'} is the item's name; to quit, press code=${'Ctrl + C'}.`;
+Every plugin is imported as a module. The module is expected to have the following members:
+
+- A **default export**: the constructor function for the plugin.
+- **Named exports**: the [static methods](./static-methods.md) called before plugins are initialized.
+
+## Plugin constructor {#plugin-constructor}
+
+The plugin module's default export is a constructor function with the signature `(context: LoadContext, options: PluginOptions) => Plugin | Promise<Plugin>`.
+
+### `context` {#context}
+
+`context` is plugin-agnostic, and the same object will be passed into all plugins used for a Docusaurus website. The `context` object contains the following fields:
+
+```ts
+type LoadContext = {
+  siteDir: string;
+  generatedFilesDir: string;
+  siteConfig: DocusaurusConfig;
+  outDir: string;
+  baseUrl: string;
+};
 ```
 
-An embedded expression is optionally preceded by a flag in the form `[a-z]+=` (a few lowercase letters, followed by an equals sign, directly preceding the embedded expression). If the expression is not preceded by any flag, it's printed out as-is. Otherwise, it's formatted with one of the formatters:
+### `options` {#options}
 
-- `path=`: `path`
-- `url=`: `url`
-- `name=`: `name`
-- `code=`: `code`
-- `subdue=`: `subdue`
-- `number=`: `num`
+`options` are the [second optional parameter when the plugins are used](../../using-plugins.md#configuring-plugins). `options` are plugin-specific and are specified by users when they use them in `docusaurus.config.js`. If there's a [`validateOptions`](./static-methods.md#validateOptions) function exported, the `options` will be validated and normalized beforehand.
 
-If the expression is an array, it's formatted by `` `\n- ${array.join('\n- ')}\n` `` (note it automatically gets a leading line end). Each member is formatted by itself and the bullet is not formatted. So you would see the above message printed as:
+Alternatively, if a preset contains the plugin, the preset will then be in charge of passing the correct options into the plugin. It is up to the individual plugin to define what options it takes.
 
-![Some text output in the terminal, containing array, code, name, and number formatting](./demo.png)
+## Example {#example}
+
+Here's a mental model for a presumptuous plugin implementation.
+
+```js
+// A JavaScript function that returns an object.
+// `context` is provided by Docusaurus. Example: siteConfig can be accessed from context.
+// `opts` is the user-defined options.
+async function myPlugin(context, opts) {
+  return {
+    // A compulsory field used as the namespace for directories to cache
+    // the intermediate data for each plugin.
+    // If you're writing your own local plugin, you will want it to
+    // be unique in order not to potentially conflict with imported plugins.
+    // A good way will be to add your own project name within.
+    name: 'docusaurus-my-project-cool-plugin',
+
+    async loadContent() {
+      // The loadContent hook is executed after siteConfig and env has been loaded.
+      // You can return a JavaScript object that will be passed to contentLoaded hook.
+    },
+
+    async contentLoaded({content, actions}) {
+      // The contentLoaded hook is done after loadContent hook is done.
+      // `actions` are set of functional API provided by Docusaurus (e.g. addRoute)
+    },
+
+    async postBuild(props) {
+      // After docusaurus <build> finish.
+    },
+
+    // TODO
+    async postStart(props) {
+      // docusaurus <start> finish
+    },
+
+    // TODO
+    afterDevServer(app, server) {
+      // https://webpack.js.org/configuration/dev-server/#devserverbefore
+    },
+
+    // TODO
+    beforeDevServer(app, server) {
+      // https://webpack.js.org/configuration/dev-server/#devserverafter
+    },
+
+    configureWebpack(config, isServer, utils, content) {
+      // Modify internal webpack config. If returned value is an Object, it
+      // will be merged into the final config using webpack-merge;
+      // If the returned value is a function, it will receive the config as the 1st argument and an isServer flag as the 2nd argument.
+    },
+
+    getPathsToWatch() {
+      // Paths to watch.
+    },
+
+    getThemePath() {
+      // Returns the path to the directory where the theme components can
+      // be found.
+    },
+
+    getClientModules() {
+      // Return an array of paths to the modules that are to be imported
+      // in the client bundle. These modules are imported globally before
+      // React even renders the initial UI.
+    },
+
+    extendCli(cli) {
+      // Register an extra command to enhance the CLI of Docusaurus
+    },
+
+    injectHtmlTags({content}) {
+      // Inject head and/or body HTML tags.
+    },
+
+    async getTranslationFiles({content}) {
+      // Return translation files
+    },
+
+    translateContent({content, translationFiles}) {
+      // translate the plugin content here
+    },
+
+    translateThemeConfig({themeConfig, translationFiles}) {
+      // translate the site themeConfig here
+    },
+
+    async getDefaultCodeTranslationMessages() {
+      // return default theme translations here
+    },
+  };
+}
+
+myPlugin.validateOptions = ({options, validate}) => {
+  const validatedOptions = validate(myValidationSchema, options);
+  return validationOptions;
+};
+
+myPlugin.validateThemeConfig = ({themeConfig, validate}) => {
+  const validatedThemeConfig = validate(myValidationSchema, options);
+  return validatedThemeConfig;
+};
+
+module.exports = myPlugin;
+```

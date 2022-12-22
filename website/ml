@@ -1,727 +1,216 @@
 ---
-sidebar_label: Client API
+description: How to install Docusaurus locally, and start a Docusaurus site in no time.
 ---
 
-# Docusaurus Client API
+# Installation
 
-Docusaurus provides some APIs on the clients that can be helpful to you when building your site.
+```mdx-code-block
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+```
 
-## Components {#components}
+Docusaurus is essentially a set of npm [packages](https://github.com/facebook/docusaurus/tree/main/packages).
 
-### `<ErrorBoundary />` {#errorboundary}
+:::tip
 
-This component creates a [React error boundary](https://reactjs.org/docs/error-boundaries.html).
+Use the **[Fast Track](introduction.md#fast-track)** to understand Docusaurus in **5 minutes ⏱**!
 
-Use it to wrap components that might throw, and display a fallback when that happens instead of crashing the whole app.
+Use **[docusaurus.new](https://docusaurus.new)** to test Docusaurus immediately in your browser!
 
-```jsx
-import React from 'react';
-import ErrorBoundary from '@docusaurus/ErrorBoundary';
+:::
 
-const SafeComponent = () => (
-  <ErrorBoundary
-    fallback={({error, tryAgain}) => (
-      <div>
-        <p>This component crashed because of error: {error.message}.</p>
-        <button onClick={tryAgain}>Try Again!</button>
-      </div>
-    )}>
-    <SomeDangerousComponentThatMayThrow />
-  </ErrorBoundary>
-);
+## Requirements {#requirements}
+
+- [Node.js](https://nodejs.org/en/download/) version 16.14 or above (which can be checked by running `node -v`). You can use [nvm](https://github.com/nvm-sh/nvm) for managing multiple Node versions on a single machine installed.
+  - When installing Node.js, you are recommended to check all checkboxes related to dependencies.
+
+## Scaffold project website {#scaffold-project-website}
+
+The easiest way to install Docusaurus is to use the command line tool that helps you scaffold a skeleton Docusaurus website. You can run this command anywhere in a new empty repository or within an existing repository, it will create a new directory containing the scaffolded files.
+
+```bash
+npx create-docusaurus@latest my-website classic
+```
+
+We recommend the `classic` template so that you can get started quickly, and it contains features found in Docusaurus 1. The `classic` template contains `@docusaurus/preset-classic` which includes standard documentation, a blog, custom pages, and a CSS framework (with dark mode support). You can get up and running extremely quickly with the classic template and customize things later on when you have gained more familiarity with Docusaurus.
+
+You can also use the template's TypeScript variant by passing the `--typescript` flag. See [TypeScript support](./typescript-support.md) for more information.
+
+```bash
+npx create-docusaurus@latest my-website classic --typescript
+```
+
+:::info FB-Only
+
+If you are setting up a new Docusaurus website for a Facebook open source project, use the `facebook` template instead, which comes with some useful Facebook-specific defaults:
+
+```bash
+npx create-docusaurus@latest my-website facebook
+```
+
+:::
+
+<details>
+  <summary>Alternative installation commands</summary>
+
+You can also initialize a new project using your preferred project manager:
+
+```mdx-code-block
+<Tabs>
+<TabItem value="npm">
+```
+
+```bash
+npm init docusaurus
 ```
 
 ```mdx-code-block
-import ErrorBoundaryTestButton from "@site/src/components/ErrorBoundaryTestButton"
+</TabItem>
+<TabItem value="yarn">
+```
+
+```bash
+yarn create docusaurus
+```
+
+```mdx-code-block
+</TabItem>
+<TabItem value="pnpm">
+```
+
+```bash
+pnpm create docusaurus
+```
+
+```mdx-code-block
+</TabItem>
+</Tabs>
+```
+
+</details>
+
+Run `npx create-docusaurus@latest --help`, or check out its [API docs](./api/misc/create-docusaurus.md) for more information about all available flags.
+
+## Project structure {#project-structure}
+
+Assuming you chose the classic template and named your site `my-website`, you will see the following files generated under a new directory `my-website/`:
+
+```bash
+my-website
+├── blog
+│   ├── 2019-05-28-hola.md
+│   ├── 2019-05-29-hello-world.md
+│   └── 2020-05-30-welcome.md
+├── docs
+│   ├── doc1.md
+│   ├── doc2.md
+│   ├── doc3.md
+│   └── mdx.md
+├── src
+│   ├── css
+│   │   └── custom.css
+│   └── pages
+│       ├── styles.module.css
+│       └── index.js
+├── static
+│   └── img
+├── docusaurus.config.js
+├── package.json
+├── README.md
+├── sidebars.js
+└── yarn.lock
+```
+
+### Project structure rundown {#project-structure-rundown}
+
+- `/blog/` - Contains the blog Markdown files. You can delete the directory if you've disabled the blog plugin, or you can change its name after setting the `path` option. More details can be found in the [blog guide](blog.mdx)
+- `/docs/` - Contains the Markdown files for the docs. Customize the order of the docs sidebar in `sidebars.js`. You can delete the directory if you've disabled the docs plugin, or you can change its name after setting the `path` option. More details can be found in the [docs guide](./guides/docs/docs-introduction.md)
+- `/src/` - Non-documentation files like pages or custom React components. You don't have to strictly put your non-documentation files here, but putting them under a centralized directory makes it easier to specify in case you need to do some sort of linting/processing
+  - `/src/pages` - Any JSX/TSX/MDX file within this directory will be converted into a website page. More details can be found in the [pages guide](guides/creating-pages.md)
+- `/static/` - Static directory. Any contents inside here will be copied into the root of the final `build` directory
+- `/docusaurus.config.js` - A config file containing the site configuration. This is the equivalent of `siteConfig.js` in Docusaurus v1
+- `/package.json` - A Docusaurus website is a React app. You can install and use any npm packages you like in them
+- `/sidebars.js` - Used by the documentation to specify the order of documents in the sidebar
+
+### Monorepos {#monorepos}
+
+If you are using Docusaurus for documentation of an existing project, a monorepo may be the solution for you. Monorepos allow you to share dependencies between similar projects. For example, your website may use your local packages to showcase the latest features, instead of depending on a released version; your contributors can also conveniently update the docs as they implement features. An example monorepo folder structure is below:
+
+```bash
+my-monorepo
+├── package-a # Another package, your actual project
+│   ├── src
+│   └── package.json # Package A's dependencies
+├── website   # Docusaurus root
+│   ├── docs
+│   ├── src
+│   └── package.json # Docusaurus' dependencies
+├── package.json # Monorepo's shared dependencies
+```
+
+In this case, you should run `npx create-docusaurus` within the `./my-monorepo` folder.
+
+If you're using a hosting provider such as Netlify or Vercel, you will need to change the `Base directory` of the site to where your Docusaurus root is. In this case, that would be `./website`. Read more about configuring ignore commands in the [deployment docs](./deployment.mdx#deploying-to-netlify).
+
+Read more about monorepos in the [Yarn documentation](https://yarnpkg.com/features/workspaces) (Yarn is not the only way to set up a monorepo, but it's a common solution), or checkout [Docusaurus](https://github.com/facebook/docusaurus) and [Jest](https://github.com/facebook/jest) for some real-world examples.
+
+## Running the development server {#running-the-development-server}
+
+To preview your changes as you edit the files, you can run a local development server that will serve your website and reflect the latest changes.
+
+```bash npm2yarn
+cd my-website
+npm run start
+```
+
+By default, a browser window will open at http://localhost:3000.
+
+Congratulations! You have just created your first Docusaurus site! Browse around the site to see what's available.
+
+## Build {#build}
+
+Docusaurus is a modern static website generator so we need to build the website into a directory of static contents and put it on a web server so that it can be viewed. To build the website:
+
+```bash npm2yarn
+npm run build
+```
+
+and contents will be generated within the `/build` directory, which can be copied to any static file hosting service like [GitHub pages](https://pages.github.com/), [Vercel](https://vercel.com/) or [Netlify](https://www.netlify.com/). Check out the docs on [deployment](deployment.mdx) for more details.
+
+## Updating your Docusaurus version {#updating-your-docusaurus-version}
+
+There are many ways to update your Docusaurus version. One guaranteed way is to manually change the version number in `package.json` to the desired version. Note that all `@docusaurus/`-namespaced packages should be using the same version.
+
+import UpgradeGuide from '@site/src/components/UpgradeGuide';
+
+<UpgradeGuide />
+
+Then, in the directory containing `package.json`, run your package manager's install command:
+
+```bash npm2yarn
+npm install
+```
+
+To check that the update occurred successfully, run:
+
+```bash npm2yarn
+npx docusaurus --version
+```
+
+You should see the correct version as output.
+
+Alternatively, if you are using Yarn, you can do:
+
+```bash
+yarn upgrade @docusaurus/core@latest @docusaurus/preset-classic@latest
 ```
 
 :::tip
 
-To see it in action, click here: <ErrorBoundaryTestButton/>
+Use new unreleased features of Docusaurus with the [`@canary` npm dist tag](/community/canary)
 
 :::
 
-:::info
+## Problems? {#problems}
 
-Docusaurus uses this component to catch errors within the theme's layout, and also within the entire app.
-
-:::
-
-:::note
-
-This component doesn't catch build-time errors and only protects against client-side render errors that can happen when using stateful React components.
-
-:::
-
-#### Props {#errorboundary-props}
-
-- `fallback`: an optional render callback returning a JSX element. It will receive an object with 2 attributes: `error`, the error that was caught, and `tryAgain`, a function (`() => void`) callback to reset the error in the component and try rendering it again. If not present, `@theme/Error` will be rendered instead. `@theme/Error` is used for the error boundaries wrapping the site, above the layout.
-
-:::caution
-
-The `fallback` prop is a callback, and **not a React functional component**. You can't use React hooks inside this callback.
-
-:::
-
-### `<Head/>` {#head}
-
-This reusable React component will manage all of your changes to the document head. It takes plain HTML tags and outputs plain HTML tags and is beginner-friendly. It is a wrapper around [React Helmet](https://github.com/nfl/react-helmet).
-
-Usage Example:
-
-```jsx
-import React from 'react';
-// highlight-next-line
-import Head from '@docusaurus/Head';
-
-const MySEO = () => (
-  // highlight-start
-  <Head>
-    <meta property="og:description" content="My custom description" />
-    <meta charSet="utf-8" />
-    <title>My Title</title>
-    <link rel="canonical" href="http://mysite.com/example" />
-  </Head>
-  // highlight-end
-);
-```
-
-Nested or latter components will override duplicate usages:
-
-```jsx
-<Parent>
-  {/* highlight-start */}
-  <Head>
-    <title>My Title</title>
-    <meta name="description" content="Helmet application" />
-  </Head>
-  {/* highlight-end */}
-  <Child>
-    {/* highlight-start */}
-    <Head>
-      <title>Nested Title</title>
-      <meta name="description" content="Nested component" />
-    </Head>
-    {/* highlight-end */}
-  </Child>
-</Parent>
-```
-
-Outputs:
-
-```html
-<head>
-  <title>Nested Title</title>
-  <meta name="description" content="Nested component" />
-</head>
-```
-
-### `<Link/>` {#link}
-
-This component enables linking to internal pages as well as a powerful performance feature called preloading. Preloading is used to prefetch resources so that the resources are fetched by the time the user navigates with this component. We use an `IntersectionObserver` to fetch a low-priority request when the `<Link>` is in the viewport and then use an `onMouseOver` event to trigger a high-priority request when it is likely that a user will navigate to the requested resource.
-
-The component is a wrapper around react-router’s `<Link>` component that adds useful enhancements specific to Docusaurus. All props are passed through to react-router’s `<Link>` component.
-
-External links also work, and automatically have these props: `target="_blank" rel="noopener noreferrer"`.
-
-```jsx
-import React from 'react';
-// highlight-next-line
-import Link from '@docusaurus/Link';
-
-const Page = () => (
-  <div>
-    <p>
-      {/* highlight-next-line */}
-      Check out my <Link to="/blog">blog</Link>!
-    </p>
-    <p>
-      {/* highlight-next-line */}
-      Follow me on <Link to="https://twitter.com/docusaurus">Twitter</Link>!
-    </p>
-  </div>
-);
-```
-
-#### `to`: string {#to-string}
-
-The target location to navigate to. Example: `/docs/introduction`.
-
-```jsx
-<Link to="/courses" />
-```
-
-:::tip
-
-Prefer this component to vanilla `<a>` tags because Docusaurus does a lot of optimizations (e.g. broken path detection, prefetching, applying base URL...) if you use `<Link>`.
-
-:::
-
-### `<Redirect/>` {#redirect}
-
-Rendering a `<Redirect>` will navigate to a new location. The new location will override the current location in the history stack like server-side redirects (HTTP 3xx) do. You can refer to [React Router's Redirect documentation](https://reacttraining.com/react-router/web/api/Redirect) for more info on available props.
-
-Example usage:
-
-```jsx
-import React from 'react';
-// highlight-next-line
-import {Redirect} from '@docusaurus/router';
-
-const Home = () => {
-  // highlight-next-line
-  return <Redirect to="/docs/test" />;
-};
-```
-
-:::note
-
-`@docusaurus/router` implements [React Router](https://reacttraining.com/react-router/web/guides/quick-start) and supports its features.
-
-:::
-
-### `<BrowserOnly/>` {#browseronly}
-
-The `<BrowserOnly>` component permits to render React components only in the browser after the React app has hydrated.
-
-:::tip
-
-Use it for integrating with code that can't run in Node.js, because the `window` or `document` objects are being accessed.
-
-:::
-
-#### Props {#browseronly-props}
-
-- `children`: render function prop returning browser-only JSX. Will not be executed in Node.js
-- `fallback` (optional): JSX to render on the server (Node.js) and until React hydration completes.
-
-#### Example with code {#browseronly-example-code}
-
-```jsx
-// highlight-start
-import BrowserOnly from '@docusaurus/BrowserOnly';
-// highlight-end
-
-const MyComponent = () => {
-  return (
-    // highlight-start
-    <BrowserOnly>
-      {() => <span>page url = {window.location.href}</span>}
-    </BrowserOnly>
-    // highlight-end
-  );
-};
-```
-
-#### Example with a library {#browseronly-example-library}
-
-```jsx
-// highlight-start
-import BrowserOnly from '@docusaurus/BrowserOnly';
-// highlight-end
-
-const MyComponent = (props) => {
-  return (
-    // highlight-start
-    <BrowserOnly fallback={<div>Loading...</div>}>
-      {() => {
-        const LibComponent = require('some-lib').LibComponent;
-        return <LibComponent {...props} />;
-      }}
-    </BrowserOnly>
-    // highlight-end
-  );
-};
-```
-
-### `<Interpolate/>` {#interpolate}
-
-A simple interpolation component for text containing dynamic placeholders.
-
-The placeholders will be replaced with the provided dynamic values and JSX elements of your choice (strings, links, styled elements...).
-
-#### Props {#interpolate-props}
-
-- `children`: text containing interpolation placeholders like `{placeholderName}`
-- `values`: object containing interpolation placeholder values
-
-```jsx
-import React from 'react';
-import Link from '@docusaurus/Link';
-import Interpolate from '@docusaurus/Interpolate';
-
-export default function VisitMyWebsiteMessage() {
-  return (
-    // highlight-start
-    <Interpolate
-      values={{
-        firstName: 'Sébastien',
-        website: (
-          <Link to="https://docusaurus.io" className="my-website-class">
-            website
-          </Link>
-        ),
-      }}>
-      {'Hello, {firstName}! How are you? Take a look at my {website}'}
-    </Interpolate>
-    // highlight-end
-  );
-}
-```
-
-### `<Translate/>` {#translate}
-
-When [localizing your site](./i18n/i18n-introduction.md), the `<Translate/>` component will allow providing **translation support to React components**, such as your homepage. The `<Translate>` component supports [interpolation](#interpolate).
-
-The translation strings will statically extracted from your code with the [`docusaurus write-translations`](./cli.md#docusaurus-write-translations-sitedir) CLI and a `code.json` translation file will be created in `website/i18n/[locale]`.
-
-:::note
-
-The `<Translate/>` props **must be hardcoded strings**.
-
-Apart from the `values` prop used for interpolation, it is **not possible to use variables**, or the static extraction wouldn't work.
-
-:::
-
-#### Props {#translate-props}
-
-- `children`: untranslated string in the default site locale (can contain [interpolation placeholders](#interpolate))
-- `id`: optional value to be used as the key in JSON translation files
-- `description`: optional text to help the translator
-- `values`: optional object containing interpolation placeholder values
-
-#### Example {#example}
-
-```jsx title="src/pages/index.js"
-import React from 'react';
-import Layout from '@theme/Layout';
-
-// highlight-start
-import Translate from '@docusaurus/Translate';
-// highlight-end
-
-export default function Home() {
-  return (
-    <Layout>
-      <h1>
-        {/* highlight-start */}
-        <Translate
-          id="homepage.title"
-          description="The homepage welcome message">
-          Welcome to my website
-        </Translate>
-        {/* highlight-end */}
-      </h1>
-      <main>
-        {/* highlight-start */}
-        <Translate values={{firstName: 'Sébastien'}}>
-          {'Welcome, {firstName}! How are you?'}
-        </Translate>
-        {/* highlight-end */}
-      </main>
-    </Layout>
-  );
-}
-```
-
-:::note
-
-You can even omit the children prop and specify a translation string in your `code.json` file manually after running the `docusaurus write-translations` CLI command.
-
-```jsx
-<Translate id="homepage.title" />
-```
-
-:::
-
-## Hooks {#hooks}
-
-### `useDocusaurusContext` {#useDocusaurusContext}
-
-React hook to access Docusaurus Context. The context contains the `siteConfig` object from [docusaurus.config.js](api/docusaurus.config.js.md) and some additional site metadata.
-
-```ts
-type PluginVersionInformation =
-  | {readonly type: 'package'; readonly version?: string}
-  | {readonly type: 'project'}
-  | {readonly type: 'local'}
-  | {readonly type: 'synthetic'};
-
-type SiteMetadata = {
-  readonly docusaurusVersion: string;
-  readonly siteVersion?: string;
-  readonly pluginVersions: Record<string, PluginVersionInformation>;
-};
-
-type I18nLocaleConfig = {
-  label: string;
-  direction: string;
-};
-
-type I18n = {
-  defaultLocale: string;
-  locales: [string, ...string[]];
-  currentLocale: string;
-  localeConfigs: Record<string, I18nLocaleConfig>;
-};
-
-type DocusaurusContext = {
-  siteConfig: DocusaurusConfig;
-  siteMetadata: SiteMetadata;
-  globalData: Record<string, unknown>;
-  i18n: I18n;
-  codeTranslations: Record<string, string>;
-};
-```
-
-Usage example:
-
-```jsx
-import React from 'react';
-import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
-
-const MyComponent = () => {
-  // highlight-next-line
-  const {siteConfig, siteMetadata} = useDocusaurusContext();
-  return (
-    <div>
-      {/* highlight-start */}
-      <h1>{siteConfig.title}</h1>
-      <div>{siteMetadata.siteVersion}</div>
-      <div>{siteMetadata.docusaurusVersion}</div>
-      {/* highlight-end */}
-    </div>
-  );
-};
-```
-
-:::note
-
-The `siteConfig` object only contains **serializable values** (values that are preserved after `JSON.stringify()`). Functions, regexes, etc. would be lost on the client side.
-
-:::
-
-### `useIsBrowser` {#useIsBrowser}
-
-Returns `true` when the React app has successfully hydrated in the browser.
-
-:::caution
-
-Use this hook instead of `typeof windows !== 'undefined'` in React rendering logic.
-
-The first client-side render output (in the browser) **must be exactly the same** as the server-side render output (Node.js). Not following this rule can lead to unexpected hydration behaviors, as described in [The Perils of Rehydration](https://www.joshwcomeau.com/react/the-perils-of-rehydration/).
-
-:::
-
-Usage example:
-
-```jsx
-import React from 'react';
-import useIsBrowser from '@docusaurus/useIsBrowser';
-
-const MyComponent = () => {
-  // highlight-start
-  const isBrowser = useIsBrowser();
-  // highlight-end
-  return <div>{isBrowser ? 'Client' : 'Server'}</div>;
-};
-```
-
-### `useBaseUrl` {#useBaseUrl}
-
-React hook to prepend your site `baseUrl` to a string.
-
-:::caution
-
-**Don't use it for regular links!**
-
-The `/baseUrl/` prefix is automatically added to all **absolute paths** by default:
-
-- Markdown: `[link](/my/path)` will link to `/baseUrl/my/path`
-- React: `<Link to="/my/path/">link</Link>` will link to `/baseUrl/my/path`
-
-:::
-
-#### Options {#options}
-
-```ts
-type BaseUrlOptions = {
-  forcePrependBaseUrl: boolean;
-  absolute: boolean;
-};
-```
-
-#### Example usage: {#example-usage}
-
-```jsx
-import React from 'react';
-import useBaseUrl from '@docusaurus/useBaseUrl';
-
-const SomeImage = () => {
-  // highlight-start
-  const imgSrc = useBaseUrl('/img/myImage.png');
-  // highlight-end
-  return <img src={imgSrc} />;
-};
-```
-
-:::tip
-
-In most cases, you don't need `useBaseUrl`.
-
-Prefer a `require()` call for [assets](./guides/markdown-features/markdown-features-assets.mdx):
-
-```jsx
-<img src={require('@site/static/img/myImage.png').default} />
-```
-
-:::
-
-### `useBaseUrlUtils` {#useBaseUrlUtils}
-
-Sometimes `useBaseUrl` is not good enough. This hook return additional utils related to your site's base URL.
-
-- `withBaseUrl`: useful if you need to add base URLs to multiple URLs at once.
-
-```jsx
-import React from 'react';
-import {useBaseUrlUtils} from '@docusaurus/useBaseUrl';
-
-const Component = () => {
-  const urls = ['/a', '/b'];
-  // highlight-start
-  const {withBaseUrl} = useBaseUrlUtils();
-  const urlsWithBaseUrl = urls.map(withBaseUrl);
-  // highlight-end
-  return <div>{/* ... */}</div>;
-};
-```
-
-### `useGlobalData` {#useGlobalData}
-
-React hook to access Docusaurus global data created by all the plugins.
-
-Global data is namespaced by plugin name then by plugin ID.
-
-:::info
-
-Plugin ID is only useful when a plugin is used multiple times on the same site. Each plugin instance is able to create its own global data.
-
-:::
-
-```ts
-type GlobalData = Record<
-  PluginName,
-  Record<
-    PluginId, // "default" by default
-    any // plugin-specific data
-  >
->;
-```
-
-Usage example:
-
-```jsx
-import React from 'react';
-// highlight-next-line
-import useGlobalData from '@docusaurus/useGlobalData';
-
-const MyComponent = () => {
-  // highlight-start
-  const globalData = useGlobalData();
-  const myPluginData = globalData['my-plugin']['default'];
-  return <div>{myPluginData.someAttribute}</div>;
-  // highlight-end
-};
-```
-
-:::tip
-
-Inspect your site's global data at `./docusaurus/globalData.json`
-
-:::
-
-### `usePluginData` {#usePluginData}
-
-Access global data created by a specific plugin instance.
-
-This is the most convenient hook to access plugin global data and should be used most of the time.
-
-`pluginId` is optional if you don't use multi-instance plugins.
-
-```ts
-function usePluginData(
-  pluginName: string,
-  pluginId?: string,
-  options?: {failfast?: boolean},
-);
-```
-
-Usage example:
-
-```jsx
-import React from 'react';
-// highlight-next-line
-import {usePluginData} from '@docusaurus/useGlobalData';
-
-const MyComponent = () => {
-  // highlight-start
-  const myPluginData = usePluginData('my-plugin');
-  return <div>{myPluginData.someAttribute}</div>;
-  // highlight-end
-};
-```
-
-### `useAllPluginInstancesData` {#useAllPluginInstancesData}
-
-Access global data created by a specific plugin. Given a plugin name, it returns the data of all the plugins instances of that name, by plugin id.
-
-```ts
-function useAllPluginInstancesData(
-  pluginName: string,
-  options?: {failfast?: boolean},
-);
-```
-
-Usage example:
-
-```jsx
-import React from 'react';
-// highlight-next-line
-import {useAllPluginInstancesData} from '@docusaurus/useGlobalData';
-
-const MyComponent = () => {
-  // highlight-start
-  const allPluginInstancesData = useAllPluginInstancesData('my-plugin');
-  const myPluginData = allPluginInstancesData['default'];
-  return <div>{myPluginData.someAttribute}</div>;
-  // highlight-end
-};
-```
-
-## Functions {#functions}
-
-### `interpolate` {#interpolate-1}
-
-The imperative counterpart of the [`<Interpolate>`](#interpolate) component.
-
-#### Signature {#signature}
-
-```ts
-// Simple string interpolation
-function interpolate(text: string, values: Record<string, string>): string;
-
-// JSX interpolation
-function interpolate(
-  text: string,
-  values: Record<string, ReactNode>,
-): ReactNode;
-```
-
-#### Example {#example-1}
-
-```js
-// highlight-next-line
-import {interpolate} from '@docusaurus/Interpolate';
-
-const message = interpolate('Welcome {firstName}', {firstName: 'Sébastien'});
-```
-
-### `translate` {#translate-imperative}
-
-The imperative counterpart of the [`<Translate>`](#translate) component. Also supporting [placeholders interpolation](#interpolate).
-
-:::tip
-
-Use the imperative API for the **rare cases** where a **component cannot be used**, such as:
-
-- the page `title` metadata
-- the `placeholder` props of form inputs
-- the `aria-label` props for accessibility
-
-:::
-
-#### Signature {#signature-1}
-
-```ts
-function translate(
-  translation: {message: string; id?: string; description?: string},
-  values: Record<string, string>,
-): string;
-```
-
-#### Example {#example-2}
-
-```jsx title="src/pages/index.js"
-import React from 'react';
-import Layout from '@theme/Layout';
-
-// highlight-next-line
-import {translate} from '@docusaurus/Translate';
-
-export default function Home() {
-  return (
-    <Layout
-      // highlight-next-line
-      title={translate({message: 'My page meta title'})}>
-      <img
-        src={'https://docusaurus.io/logo.png'}
-        aria-label={
-          // highlight-start
-          translate(
-            {
-              message: 'The logo of site {siteName}',
-              // Optional
-              id: 'homepage.logo.ariaLabel',
-              description: 'The home page logo aria label',
-            },
-            {siteName: 'Docusaurus'},
-          )
-          // highlight-end
-        }
-      />
-    </Layout>
-  );
-}
-```
-
-## Modules {#modules}
-
-### `ExecutionEnvironment` {#executionenvironment}
-
-A module that exposes a few boolean variables to check the current rendering environment.
-
-:::caution
-
-For React rendering logic, use [`useIsBrowser()`](#useIsBrowser) or [`<BrowserOnly>`](#browseronly) instead.
-
-:::
-
-Example:
-
-```js
-import ExecutionEnvironment from '@docusaurus/ExecutionEnvironment';
-
-if (ExecutionEnvironment.canUseDOM) {
-  require('lib-that-only-works-client-side');
-}
-```
-
-| Field                                             | Description                                                   |
-| ------------------------------------------------- | ------------------------------------------------------------- |
-| `ExecutionEnvironment.canUseDOM`                  | `true` if on client/browser, `false` on Node.js/prerendering. |
-| `ExecutionEnvironment.canUseEventListeners`       | `true` if on client and has `window.addEventListener`.        |
-| `ExecutionEnvironment.canUseIntersectionObserver` | `true` if on client and has `IntersectionObserver`.           |
-| `ExecutionEnvironment.canUseViewport`             | `true` if on client and has `window.screen`.                  |
-
-### `constants` {#constants}
-
-A module exposing useful constants to client-side theme code.
-
-```js
-import {DEFAULT_PLUGIN_ID} from '@docusaurus/constants';
-```
-
-| Named export        | Value     |
-| ------------------- | --------- |
-| `DEFAULT_PLUGIN_ID` | `default` |
+Ask for help on [Stack Overflow](https://stackoverflow.com/questions/tagged/docusaurus), on our [GitHub repository](https://github.com/facebook/docusaurus), our [Discord server](https://discordapp.com/invite/docusaurus), or [Twitter](https://twitter.com/docusaurus).

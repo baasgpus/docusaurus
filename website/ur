@@ -1,14 +1,13 @@
 ---
-tags:
-  - paginated-tag
+authors:
+  - slorber
+  - 
+    name: Josh-Cena
+    image_url: https://avatars.githubusercontent.com/u/55398995?v=4
+    url: https://joshcena.com
+tags: '[ blog, docusaurus, paginated-tag, long, long-long, long-long-long, long-long-long-long, long-long-long-long-long, ] ---'
 ---
 
-# Hmmm!
+# Multiple authors
 
-This is a blog post from an anonymous author!
-
-```mdx-code-block
-import Partial from "./_partial.mdx"
-
-<Partial />
-```
+You can have multiple authors for one blog post!

@@ -1,35 +1,14 @@
-## Page
+/**
+ * Copyright (c) Facebook, Inc. and its affiliates.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
 
-Let's import a MDX partial at `./_pagePartial.md`:
+import React from 'react';
+import Layout from '@theme/Layout';
 
-```mdx-code-block
-import PagePartial from "./_pagePartial.md"
-
-<PagePartial />
-```
-
----
-
-Now let's import `../README.md`:
-
-```mdx-code-block
-import Readme from "../README.md"
-
-<Readme />
-```
-
-### Other tests
-
-- [Code block tests](/tests/pages/code-block-tests)
-- [Link tests](/tests/pages/link-tests)
-- [Error boundary tests](/tests/pages/error-boundary-tests)
-- [Hydration tests](/tests/pages/hydration-tests)
-- [Asset linking tests](/tests/pages/markdown-tests)
-- [General Markdown tests](/tests/pages/markdownPageTests)
-- [TOC tests](/tests/pages/page-toc-tests)
-- [Diagram tests](/tests/pages/diagrams)
-- [Tabs tests](/tests/pages/tabs-tests)
-- [z-index tests](/tests/pages/z-index-tests)
-- [Head metadata tests](/tests/pages/head-metadata)
-- [Unlisted page](/tests/pages/unlisted)
-- [Analytics](/tests/pages/analytics)
+// See https://github.com/facebook/docusaurus/issues/6337#issuecomment-1012913647
+export default function LayoutNoChildren(): JSX.Element {
+  return <Layout />;
+}

@@ -1,13 +1,20 @@
 ---
+tags:
+  - paginated-tag
 authors:
-  - slorber
   - 
-    name: Josh-Cena
-    image_url: https://avatars.githubusercontent.com/u/55398995?v=4
-    url: https://joshcena.com
-tags: '[ blog, docusaurus, paginated-tag, long, long-long, long-long-long, long-long-long-long, long-long-long-long-long, ] ---'
+    name: Josh-Cena1
+  - 
+    name: Josh-Cena2
+    image_url: https://github.com/Josh-Cena.png
+  - 
+    name: Josh-Cena3
+    url: https://github.com/Josh-Cena
+  - 
+    name: Josh-Cena4
+    email: sidechen2003@gmail.com
 ---
 
-# Multiple authors
+# Post with duplicate title
 
-You can have multiple authors for one blog post!
+See https://github.com/facebook/docusaurus/issues/6059. This one and [2021-11-13-dup-title.md](./2021-11-13-dup-title.md) should both show up.

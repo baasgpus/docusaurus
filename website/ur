@@ -1,144 +1,166 @@
 ---
-slug: /sidebar/multiple-sidebars
+id: create-doc
+description: Create a Markdown Document
+slug: /create-doc
 ---
 
-# Using multiple sidebars
+# Create a doc
 
-You can create a sidebar for each **set of Markdown files** that you want to **group together**.
+Create a Markdown file, `greeting.md`, and place it under the `docs` directory.
 
-:::tip
+```bash
+website # root directory of your site
+├── docs
+│   └── greeting.md
+├── src
+│   └── pages
+├── docusaurus.config.js
+├── ...
+```
 
-The Docusaurus site is a good example of using multiple sidebars:
+```md
+---
+description: Create a doc page with rich content.
+---
 
-- [Docs](../../../introduction.md)
-- [API](../../../cli.md)
+# Hello from Docusaurus
+
+Are you ready to create the documentation site for your open source project?
+
+## Headers
+
+will show up on the table of contents on the upper right
+
+So that your users will know what this page is all about without scrolling down or even without reading too much.
+
+## Only h2 and h3 will be in the TOC by default.
+
+You can configure the TOC heading levels either per-document or in the theme configuration.
+
+The headers are well-spaced so that the hierarchy is clear.
+
+- lists will help you
+- present the key points
+- that you want your users to remember
+  - and you may nest them
+    - multiple times
+
+## Custom ID headers {#custom-id}
+
+With `{#custom-id}` syntax you can set your own header ID.
+```
+
+:::note
+
+All files prefixed with an underscore (`_`) under the `docs` directory are treated as "partial" pages and will be ignored by default.
+
+Read more about [importing partial pages](../markdown-features/markdown-features-react.mdx#importing-markdown).
 
 :::
 
-Consider this example:
+## Doc front matter {#doc-front-matter}
 
-```js title="sidebars.js"
-module.exports = {
-  tutorialSidebar: {
-    'Category A': ['doc1', 'doc2'],
-  },
-  apiSidebar: ['doc3', 'doc4'],
-};
-```
+The [front matter](../markdown-features/markdown-features-intro.mdx#front-matter) is used to provide additional metadata for your doc page. Front matter is optional—Docusaurus will be able to infer all necessary metadata without the front matter. For example, the [doc tags](#dog-tags) feature introduced below requires using front matter. For all possible fields, see [the API documentation](../../api/plugins/plugin-content-docs.md#markdown-front-matter).
 
-When browsing `doc1` or `doc2`, the `tutorialSidebar` will be displayed; when browsing `doc3` or `doc4`, the `apiSidebar` will be displayed.
+## Doc tags {#doc-tags}
 
-## Understanding sidebar association {#sidebar-association}
+Optionally, you can add tags to your doc pages, which introduces another dimension of categorization in addition to the [docs sidebar](./sidebar/index.md). Tags are passed in the front matter as a list of labels:
 
-Following the example above, if a `commonDoc` is included in both sidebars:
-
-```js title="sidebars.js"
-module.exports = {
-  tutorialSidebar: {
-    'Category A': ['doc1', 'doc2', 'commonDoc'],
-  },
-  apiSidebar: ['doc3', 'doc4', 'commonDoc'],
-};
-```
-
-How does Docusaurus know which sidebar to display when browsing `commonDoc`? Answer: it doesn't, and we don't guarantee which sidebar it will pick.
-
-When you add doc Y to sidebar X, it creates a two-way binding: sidebar X contains a link to doc Y, and when browsing doc Y, sidebar X will be displayed. But sometimes, we want to break either implicit binding:
-
-1. _How do I generate a link to doc Y in sidebar X without making sidebar X displayed on Y?_ For example, when I include doc Y in multiple sidebars as in the example above, and I want to explicitly tell Docusaurus to display one sidebar?
-2. _How do I make sidebar X displayed when browsing doc Y, but sidebar X shouldn't contain the link to Y?_ For example, when Y is a "doc home page" and the sidebar is purely used for navigation?
-
-Front matter option `displayed_sidebar` will forcibly set the sidebar association. For the same example, you can still use doc shorthands without any special configuration:
-
-```js title="sidebars.js"
-module.exports = {
-  tutorialSidebar: {
-    'Category A': ['doc1', 'doc2'],
-  },
-  apiSidebar: ['doc3', 'doc4'],
-};
-```
-
-And then add a front matter:
-
-```md title="commonDoc.md"
+```md "your-doc-page.md"
 ---
-displayed_sidebar: apiSidebar
+id: doc-with-tags
+title: A doc with tags
+tags:
+  - Demo
+  - Getting started
 ---
 ```
 
-Which explicitly tells Docusaurus to display `apiSidebar` when browsing `commonDoc`. Using the same method, you can make sidebar X which doesn't contain doc Y appear on doc Y:
+:::tip
 
-```md title="home.md"
----
-displayed_sidebar: tutorialSidebar
----
+Tags can also be declared with `tags: [Demo, Getting started]`.
+
+Read more about all the possible [Yaml array syntaxes](https://www.w3schools.io/file/yaml-arrays/).
+
+:::
+
+## Organizing folder structure {#organizing-folder-structure}
+
+How the Markdown files are arranged under the `docs` folder can have multiple impacts on Docusaurus content generation. However, most of them can be decoupled from the file structure.
+
+### Document ID {#document-id}
+
+Every document has a unique `id`. By default, a document `id` is the name of the document (without the extension) relative to the root docs directory.
+
+For example, the ID of `greeting.md` is `greeting`, and the ID of `guide/hello.md` is `guide/hello`.
+
+```bash
+website # Root directory of your site
+└── docs
+   ├── greeting.md
+   └── guide
+      └── hello.md
 ```
 
-Even when `tutorialSidebar` doesn't contain a link to `home`, it will still be displayed when viewing `home`.
+However, the **last part** of the `id` can be defined by the user in the front matter. For example, if `guide/hello.md`'s content is defined as below, its final `id` is `guide/part1`.
 
-If you set `displayed_sidebar: null`, no sidebar will be displayed whatsoever on this page, and subsequently, no pagination either.
-
-## Generating pagination {#generating-pagination}
-
-Docusaurus uses the sidebar to generate the "next" and "previous" pagination links at the bottom of each doc page. It strictly uses the sidebar that is displayed: if no sidebar is associated, it doesn't generate pagination either. However, the docs linked as "next" and "previous" are not guaranteed to display the same sidebar: they are included in this sidebar, but in their front matter, they may have a different `displayed_sidebar`.
-
-If a sidebar is displayed by setting `displayed_sidebar` front matter, and this sidebar doesn't contain the doc itself, no pagination is displayed.
-
-You can customize pagination with front matter `pagination_next` and `pagination_prev`. Consider this sidebar:
-
-```js title="sidebars.js"
-module.exports = {
-  tutorial: [
-    'introduction',
-    {
-      installation: ['windows', 'linux', 'macos'],
-    },
-    'getting-started',
-  ],
-};
-```
-
-The pagination next link on "windows" points to "linux", but that doesn't make sense: you would want readers to proceed to "getting started" after installation. In this case, you can set the pagination manually:
-
-```md title="windows.md"
+```md
 ---
-# highlight-next-line
-pagination_next: getting-started
+id: part1
 ---
 
-# Installation on Windows
+Lorem ipsum
 ```
 
-You can also disable displaying a pagination link with `pagination_next: null` or `pagination_prev: null`.
+The ID is used to refer to a document when hand-writing sidebars, or when using docs-related layout components or hooks.
 
-The pagination label by default is the sidebar label. You can use the front matter `pagination_label` to customize how this doc appears in the pagination.
+### Doc URLs {#doc-urls}
 
-## The `ref` item {#sidebar-item-ref}
+By default, a document's URL location is its file path relative to the `docs` folder. Use the `slug` front matter to change a document's URL.
 
-The `ref` type is identical to the [`doc` type](#sidebar-item-doc) in every way, except that it doesn't participate in generating navigation metadata. It only registers itself as a link. When [generating pagination](#generating-pagination) and [displaying sidebar](#sidebar-association), `ref` items are completely ignored.
+For example, suppose your site structure looks like this:
 
-It is particularly useful where you wish to link to the same document from multiple sidebars. The document only belongs to one sidebar (the one where it's registered as `type: 'doc'` or from an autogenerated directory), but its link will appear in all sidebars that it's registered in.
-
-Consider this example:
-
-```js title="sidebars.js"
-module.exports = {
-  tutorialSidebar: {
-    'Category A': [
-      'doc1',
-      'doc2',
-      // highlight-next-line
-      {type: 'ref', id: 'commonDoc'},
-      'doc5',
-    ],
-  },
-  apiSidebar: ['doc3', 'doc4', 'commonDoc'],
-};
-}
+```bash
+website # Root directory of your site
+└── docs
+    └── guide
+        └── hello.md
 ```
 
-You can think of the `ref` type as the equivalent to doing the following:
+By default `hello.md` will be available at `/docs/guide/hello`. You can change its URL location to `/docs/bonjour`:
 
-- Setting `displayed_sidebar: tutorialSidebar` for `commonDoc` (`ref` is ignored in sidebar association)
-- Setting `pagination_next: doc5` for `doc2` and setting `pagination_prev: doc2` for `doc5` (`ref` is ignored in pagination generation)
+```md
+---
+slug: /bonjour
+---
+
+Lorem ipsum
+```
+
+`slug` will be appended to the doc plugin's `routeBasePath`, which is `/docs` by default. See [Docs-only mode](docs-introduction.md#docs-only-mode) for how to remove the `/docs` part from the URL.
+
+:::note
+
+It is possible to use:
+
+- absolute slugs: `slug: /mySlug`, `slug: /`...
+- relative slugs: `slug: mySlug`, `slug: ./../mySlug`...
+
+:::
+
+If you want a document to be available at the root, and have a path like `https://docusaurus.io/docs/`, you can use the slug front matter:
+
+```md
+---
+id: my-home-doc
+slug: /
+---
+
+Lorem ipsum
+```
+
+### Sidebars {#sidebars}
+
+When using [autogenerated sidebars](./sidebar/autogenerated.md), the file structure will determine the sidebar structure.
+
+Our recommendation for file system organization is: make your file system mirror the sidebar structure (so you don't need to handwrite your `sidebars.js` file), and use the `slug` front matter to customize URLs of each document.

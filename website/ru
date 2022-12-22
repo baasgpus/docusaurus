@@ -1,256 +1,328 @@
 ---
-description: A Docusaurus site is a pre-rendered single-page React application. You can style it the way you style React apps.
+description: Customize your site's appearance through creating your own theme components
 ---
 
-import ColorGenerator from '@site/src/components/ColorGenerator';
+# Swizzling
 
-# Styling and Layout
+In this section, we will introduce how customization of layout is done in Docusaurus.
 
-:::tip
+> Déja vu...?
 
-This section is focused on styling through stylesheets. For more advanced customizations (DOM structure, React code...), refer to the [swizzling guide](./swizzling.md).
+This section is similar to [Styling and Layout](./styling-layout.md), but this time, we will write actual React code instead of playing with stylesheets. We will talk about a central concept in Docusaurus: **swizzling**, which allows **deeper site customizations**.
 
-:::
+In practice, swizzling permits to **swap a theme component with your own implementation**, and it comes in 2 patterns:
 
-A Docusaurus site is a single-page React application. You can style it the way you style React apps.
-
-There are a few approaches/frameworks which will work, depending on your preferences and the type of website you are trying to build. Websites that are highly interactive and behave more like web apps will benefit from more modern styling approaches that co-locate styles with the components. Component styling can also be particularly useful when you wish to customize or swizzle a component.
-
-## Global styles {#global-styles}
-
-This is the most traditional way of styling that most developers (including non-front-end developers) would be familiar with. It works fine for small websites that do not have much customization.
-
-If you're using `@docusaurus/preset-classic`, you can create your own CSS files (e.g. `/src/css/custom.css`) and import them globally by passing them as an option of the classic theme.
-
-```js title="docusaurus.config.js"
-module.exports = {
-  // ...
-  presets: [
-    [
-      '@docusaurus/preset-classic',
-      {
-        // highlight-start
-        theme: {
-          customCss: [require.resolve('./src/css/custom.css')],
-        },
-        // highlight-end
-      },
-    ],
-  ],
-};
-```
-
-Any CSS you write within that file will be available globally and can be referenced directly using string literals.
-
-```css title="/src/css/custom.css"
-.purple-text {
-  color: rebeccapurple;
-}
-```
-
-```jsx
-function MyComponent() {
-  return (
-    <main>
-      <h1 className="purple-text">Purple Heading!</h1>
-    </main>
-  );
-}
-```
-
-If you want to add CSS to any element, you can open the DevTools in your browser to inspect its class names. Class names come in several kinds:
-
-- **Theme class names**. These class names are listed exhaustively in [the next subsection](#theme-class-names). They don't have any default properties. You should always prioritize targeting those stable class names in your custom CSS.
-- **Infima class names**. These class names are found in the classic theme and usually follow the [BEM convention](http://getbem.com/naming/) of `block__element--modifier`. They are usually stable but are still considered implementation details, so you should generally avoid targeting them. However, you can [modify Infima CSS variables](#styling-your-site-with-infima).
-- **CSS module class names**. These class names have a hash in production (`codeBlockContainer_RIuc`) and are appended with a long file path in development. They are considered implementation details and you should almost always avoid targeting them in your custom CSS. If you must, you can use an [attribute selector](https://developer.mozilla.org/en-US/docs/Web/CSS/Attribute_selectors) (`[class*='codeBlockContainer']`) that ignores the hash.
-
-### Theme Class Names {#theme-class-names}
-
-We provide some stable CSS class names for robust and maintainable global layout styling. These names are theme-agnostic and meant to be targeted by custom CSS.
-
-:::tip
-
-If you can't find a way to create a robust CSS selector, please [report your customization use-case](https://github.com/facebook/docusaurus/discussions/5468) and we will consider adding new class names.
-
-:::
+- [**Ejecting**](#ejecting): creates a **copy** of the original theme component, which you can fully **customize**
+- [**Wrapping**](#wrapping): creates a **wrapper** around the original theme component, which you can **enhance**
 
 <details>
 
-<summary>Exhaustive list of stable class names</summary>
+<summary>Why is it called swizzling?</summary>
 
-```mdx-code-block
-import ThemeClassNamesCode from '!!raw-loader!@site/../packages/docusaurus-theme-common/src/utils/ThemeClassNames.ts';
-import CodeBlock from '@theme/CodeBlock';
+**The name comes from Objective-C and Swift-UI**: [method swizzling](https://pspdfkit.com/blog/2019/swizzling-in-swift/) is the process of changing the implementation of an existing selector (method).
 
-<CodeBlock className="language-ts">
-  {ThemeClassNamesCode
-    // remove source comments
-    .replace(/\/\*[\s\S]*?\*\/|\/\/.*/g,'')
-    .replace(/^ *\n/gm,'')
-    .trim()}
-</CodeBlock>
-```
+**For Docusaurus, component swizzling means providing an alternative component that takes precedence over the component provided by the theme.**
+
+You can think of it as [Monkey Patching](https://en.wikipedia.org/wiki/Monkey_patch) for React components, enabling you to override the default implementation. Gatsby has a similar concept called [theme shadowing](https://www.gatsbyjs.com/docs/how-to/plugins-and-themes/shadowing/).
+
+To gain a deeper understanding of this, you have to understand [how theme components are resolved](./advanced/client.md#theme-aliases).
 
 </details>
 
-### Styling your site with Infima {#styling-your-site-with-infima}
+## Swizzling Process
 
-`@docusaurus/preset-classic` uses [Infima](https://infima.dev/) as the underlying styling framework. Infima provides a flexible layout and common UI components styling suitable for content-centric websites (blogs, documentation, landing pages). For more details, check out the [Infima website](https://infima.dev/).
+### Overview
 
-When you scaffold your Docusaurus project with `create-docusaurus`, the website will be generated with basic Infima stylesheets and default styling. You can override Infima CSS variables globally.
+Docusaurus provides an convenient **interactive CLI** to swizzle components. You generally only need to remember the following command:
 
-```css title="/src/css/custom.css"
-:root {
-  --ifm-color-primary: #25c2a0;
-  --ifm-code-font-size: 95%;
-}
+```bash npm2yarn
+npm run swizzle
 ```
 
-Infima uses 7 shades of each color. We recommend using [ColorBox](https://www.colorbox.io/) to find the different shades of colors for your chosen primary color.
+It will generate a new component in your `src/theme` directory, which should look like this example:
 
-Alternatively, use the following tool to generate the different shades for your website and copy the variables into `/src/css/custom.css`.
-
-<ColorGenerator/>
-
-### Dark Mode {#dark-mode}
-
-In light mode, the `<html>` element has a `data-theme="light"` attribute; in dark mode, it's `data-theme="dark"`. Therefore, you can scope your CSS to dark-mode-only by targeting `html` with a specific attribute.
-
-```css
-/* Overriding root Infima variables */
-[data-theme='dark'] {
-  --ifm-color-primary: #4e89e8;
-}
-/* Styling one class specially in dark mode */
-[data-theme='dark'] .purple-text {
-  color: plum;
-}
+```mdx-code-block
+<Tabs>
+<TabItem value="Ejecting">
 ```
 
-### Mobile View {#mobile-view}
+```jsx title="src/theme/SomeComponent.js"
+import React from 'react';
 
-Docusaurus uses `996px` as the cutoff between mobile screen width and desktop. If you want your layout to be different in the mobile view, you can use media queries.
-
-```css
-.banner {
-  padding: 4rem;
-}
-/** In mobile view, reduce the padding */
-@media screen and (max-width: 996px) {
-  .heroBanner {
-    padding: 2rem;
-  }
-}
-```
-
-## CSS modules {#css-modules}
-
-To style your components using [CSS Modules](https://github.com/css-modules/css-modules), name your stylesheet files with the `.module.css` suffix (e.g. `welcome.module.css`). Webpack will load such CSS files as CSS modules and you have to reference the class names as properties of the imported CSS module (as opposed to using plain strings). This is similar to the convention used in [Create React App](https://facebook.github.io/create-react-app/docs/adding-a-css-modules-stylesheet).
-
-```css title="styles.module.css"
-.main {
-  padding: 12px;
-}
-
-.heading {
-  font-weight: bold;
-}
-
-.contents {
-  color: #ccc;
-}
-```
-
-```jsx
-import styles from './styles.module.css';
-
-function MyComponent() {
+export default function SomeComponent(props) {
+  // You can fully customize this implementation
+  // including changing the JSX, CSS and React hooks
   return (
-    <main className={styles.main}>
-      <h1 className={styles.heading}>Hello!</h1>
-      <article className={styles.contents}>Lorem Ipsum</article>
-    </main>
+    <div className="some-class">
+      <h1>Some Component</h1>
+      <p>Some component implementation details</p>
+    </div>
   );
 }
 ```
 
-The class names will be processed by webpack into a globally unique class name during build.
+```mdx-code-block
+</TabItem>
+<TabItem value="Wrapping">
+```
 
-## CSS-in-JS {#css-in-js}
+```jsx title="src/theme/SomeComponent.js"
+import React from 'react';
+import SomeComponent from '@theme-original/SomeComponent';
 
-:::caution
+export default function SomeComponentWrapper(props) {
+  // You can enhance the original component,
+  // including adding extra props or JSX elements around it
+  return (
+    <>
+      <SomeComponent {...props} />
+    </>
+  );
+}
+```
 
-CSS-in-JS support is a work in progress, so libs like MUI may have display quirks. [Welcoming PRs](https://github.com/facebook/docusaurus/issues/1640).
+```mdx-code-block
+</TabItem>
+</Tabs>
+```
+
+To get an overview of all the themes and components available to swizzle, run:
+
+```bash npm2yarn
+npm run swizzle -- --list
+```
+
+Use `--help` to see all available CLI options, or refer to the reference [swizzle CLI documentation](./cli.md#docusaurus-swizzle).
+
+:::note
+
+After swizzling a component, **restart your dev server** in order for Docusaurus to know about the new component.
 
 :::
 
-## Sass/SCSS {#sassscss}
+:::warning Prefer staying on the safe side
 
-To use Sass/SCSS as your CSS preprocessor, install the unofficial Docusaurus 2 plugin [`docusaurus-plugin-sass`](https://github.com/rlamana/docusaurus-plugin-sass). This plugin works for both global styles and the CSS modules approach:
+Be sure to understand [which components are **safe to swizzle**](#what-is-safe-to-swizzle). Some components are **internal implementation details** of a theme.
 
-1. Install [`docusaurus-plugin-sass`](https://github.com/rlamana/docusaurus-plugin-sass):
+:::
+
+:::info
+
+`docusaurus swizzle` is only an automated way to help you swizzle the component. You can also create the `src/theme/SomeComponent.js` file manually, and Docusaurus will [resolve it](./advanced/client.md#theme-aliases). There's no internal magic behind this command!
+
+:::
+
+### Ejecting {#ejecting}
+
+Ejecting a theme component is the process of **creating a copy** of the original theme component, which you can **fully customize and override**.
+
+To eject a theme component, use the swizzle CLI interactively, or with the `--eject` option:
 
 ```bash npm2yarn
-npm install --save docusaurus-plugin-sass sass
+npm run swizzle [theme name] [component name] -- --eject
 ```
 
-2. Include the plugin in your `docusaurus.config.js` file:
+An example:
 
-```js title="docusaurus.config.js"
-module.exports = {
-  // ...
-  // highlight-next-line
-  plugins: ['docusaurus-plugin-sass'],
-  // ...
-};
+```bash npm2yarn
+npm run swizzle @docusaurus/theme-classic Footer -- --eject
 ```
 
-3. Write and import your stylesheets in Sass/SCSS as normal.
+This will copy the current `<Footer />` component's implementation to your site's `src/theme` directory. Docusaurus will now use this `<Footer>` component copy instead of the original one. You are now free to completely re-implement the `<Footer>` component.
 
-### Global styles using Sass/SCSS {#global-styles-using-sassscss}
+```jsx title="src/theme/SomeComponent.js"
+import React from 'react';
 
-You can now set the `customCss` property of `@docusaurus/preset-classic` to point to your Sass/SCSS file:
-
-```js title="docusaurus.config.js"
-module.exports = {
-  presets: [
-    [
-      '@docusaurus/preset-classic',
-      {
-        // ...
-        theme: {
-          // highlight-next-line
-          customCss: [require.resolve('./src/css/custom.scss')],
-        },
-        // ...
-      },
-    ],
-  ],
-};
-```
-
-### Modules using Sass/SCSS {#modules-using-sassscss}
-
-Name your stylesheet files with the `.module.scss` suffix (e.g. `welcome.module.scss`) instead of `.css`. Webpack will use `sass-loader` to preprocess your stylesheets and load them as CSS modules.
-
-```scss title="styles.module.scss"
-.main {
-  padding: 12px;
-
-  article {
-    color: #ccc;
-  }
-}
-```
-
-```jsx
-import styles from './styles.module.scss';
-
-function MyComponent() {
+export default function Footer(props) {
   return (
-    <main className={styles.main}>
-      <article>Lorem Ipsum</article>
-    </main>
+    <footer>
+      <h1>This is my custom site footer</h1>
+      <p>And it is very different from the original</p>
+    </footer>
   );
 }
 ```
+
+:::caution
+
+Ejecting an [**unsafe**](#what-is-safe-to-swizzle) component can sometimes lead to copying a large amount of internal code, which you now have to maintain yourself. It can make Docusaurus upgrades more difficult, as you will need to migrate your customizations if the props received or internal theme APIs used have changed.
+
+**Prefer [wrapping](#wrapping) whenever possible**: the amount of code to maintain is smaller.
+
+:::
+
+:::tip Re-swizzling
+
+To keep ejected components up-to-date after a Docusaurus upgrade, re-run the eject command and compare the changes with `git diff`. You are also recommended to write a brief comment at the top of the file explaining what changes you have made, so that you could more easily re-apply your changes after re-ejection.
+
+:::
+
+### Wrapping {#wrapping}
+
+Wrapping a theme component is the process of **creating a wrapper** around the original theme component, which you can **enhance**.
+
+To wrap a theme component, use the swizzle CLI interactively, or with the `--wrap` option:
+
+```bash npm2yarn
+npm run swizzle [theme name] [component name] -- --wrap
+```
+
+An example:
+
+```bash npm2yarn
+npm run swizzle @docusaurus/theme-classic Footer -- --wrap
+```
+
+This will create a wrapper in your site's `src/theme` directory. Docusaurus will now use the `<FooterWrapper>` component instead of the original one. You can now add customizations around the original component.
+
+```jsx title="src/theme/SomeComponent.js"
+import React from 'react';
+import Footer from '@theme-original/Footer';
+
+export default function FooterWrapper(props) {
+  return (
+    <>
+      <section>
+        <h2>Extra section</h2>
+        <p>This is an extra section that appears above the original footer</p>
+      </section>
+      <Footer {...props} />
+    </>
+  );
+}
+```
+
+<details>
+  <summary>What is this <code>@theme-original</code> thing?</summary>
+
+Docusaurus uses [theme aliases](./advanced/client.md#theme-aliases) to resolve the theme components to use. The newly created wrapper takes the `@theme/SomeComponent` alias. `@theme-original/SomeComponent` permits to import original component that the wrapper shadows without creating an infinite import loop where the wrapper imports itself.
+
+</details>
+
+:::tip
+
+Wrapping a theme is a great way to **add extra components around existing one** without [ejecting](#ejecting) it. For example, you can easily add a custom comment system under each blog post:
+
+```jsx title="src/theme/BlogPostItem.js"
+import React from 'react';
+import BlogPostItem from '@theme-original/BlogPostItem';
+import MyCustomCommentSystem from '@site/src/MyCustomCommentSystem';
+
+export default function BlogPostItemWrapper(props) {
+  return (
+    <>
+      <BlogPostItem {...props} />
+      <MyCustomCommentSystem />
+    </>
+  );
+}
+```
+
+:::
+
+## What is safe to swizzle? {#what-is-safe-to-swizzle}
+
+> With great power comes great responsibility
+
+Some theme components are **internal implementation details** of a theme. Docusaurus allows you to swizzle them, but it **might be risky**.
+
+<details>
+
+<summary>Why is it risky?</summary>
+
+Theme authors (including us) might have to update their theme over time: changing the component props, name, file system location, types... For example, consider a component that receives two props `name` and `age`, but after a refactor, it now receives a `person` prop with the above two properties. Your component, which still expects these two props, will render `undefined` instead.
+
+Moreover, internal components may simply disappear. If a component is called `Sidebar` and it's later renamed to `DocSidebar`, your swizzled component will be completely ignored.
+
+**Theme components marked as unsafe may change in a backward-incompatible way between theme minor versions.** When upgrading a theme (or Docusaurus), your customizations might **behave unexpectedly**, and can even **break your site**.
+
+</details>
+
+For each theme component, the swizzle CLI will indicate **3 different levels of safety** declared by theme authors:
+
+- **Safe**: this component is safe to be swizzled, its public API is considered stable, and no breaking changes should happen within a theme **major version**
+- **Unsafe**: this component is a theme implementation detail, not safe to be swizzled, and breaking changes might happen within a theme **minor version**
+- **Forbidden**: the swizzle CLI will prevent you from swizzling this component, because it is not designed to be swizzled at all
+
+:::note
+
+Some components might be safe to wrap, but not safe to eject.
+
+:::
+
+:::info
+
+Don't be too **afraid to swizzle unsafe components**: just keep in mind that **breaking changes** might happen, and you might need to upgrade your customizations manually on minor version upgrades.
+
+:::
+
+:::note Report your use-case
+
+If you have a **strong use-case for swizzling an unsafe component**, please [**report it here**](https://github.com/facebook/docusaurus/discussions/5468) and we will work together to find a solution to make it safe.
+
+:::
+
+## Which component should I swizzle? {#which-component-should-i-swizzle}
+
+It is not always clear which component you should swizzle exactly to achieve the desired result. `@docusaurus/theme-classic`, which provides most of the theme components, has about [100 components](https://github.com/facebook/docusaurus/tree/main/packages/docusaurus-theme-classic/src/theme)!
+
+:::tip
+
+To print an overview of all the `@docusaurus/theme-classic` components:
+
+```bash npm2yarn
+npm run swizzle @docusaurus/theme-classic -- --list
+```
+
+:::
+
+You can follow these steps to locate the appropriate component to swizzle:
+
+1. **Component description.** Some components provide a short description, which is a good way to find the right one.
+2. **Component name.** Official theme components are semantically named, so you should be able to infer its function from the name. The swizzle CLI allows you to enter part of a component name to narrow down the available choices. For example, if you run `yarn swizzle @docusaurus/theme-classic`, and enter `Doc`, only the docs-related components will be listed.
+3. **Start with a higher-level component.** Components form a tree with some components importing others. Every route will be associated with one top-level component that the route will render (most of them listed in [Routing in content plugins](./advanced/routing.md#routing-in-content-plugins)). For example, all blog post pages have `@theme/BlogPostPage` as the topmost component. You can start with swizzling this component, and then go down the component tree to locate the component that renders just what you are targeting. Don't forget to unswizzle the rest by deleting the files after you've found the correct one, so you don't maintain too many components.
+4. **Read the [theme source code](https://github.com/facebook/docusaurus/tree/main/packages/docusaurus-theme-classic/src/theme)** and use search wisely.
+
+:::tip Just ask!
+
+If you still have no idea which component to swizzle to achieve the desired effect, you can reach out for help in one of our [support channels](/community/support).
+
+We also want to understand better your fanciest customization use-cases, so please [**report them**](https://github.com/facebook/docusaurus/discussions/5468).
+
+:::
+
+## Do I need to swizzle? {#do-i-need-to-swizzle}
+
+Swizzling ultimately means you have to maintain some additional React code that interact with Docusaurus internal APIs. If you can, think about the following alternatives when customizing your site:
+
+1. **Use CSS.** CSS rules and selectors can often help you achieve a decent degree of customization. Refer to [styling and layout](./styling-layout.md) for more details.
+2. **Use translations.** It may sound surprising, but translations are ultimately just a way to customize the text labels. For example, if your site's default language is `en`, you can still run `yarn write-translations -l en` and edit the `code.json` emitted. Refer to the [i18n tutorial](./i18n/i18n-tutorial.md) for more details.
+
+:::tip
+
+**The smaller, the better.** If swizzling is inevitable, prefer to swizzle only the relevant part and maintain as little code on your own as possible. Swizzling a small component often means less risk of **breaking changes** during upgrade.
+
+[Wrapping](#wrapping) is also a far safer alternative to [ejecting](#ejecting).
+
+:::
+
+## Wrapping your site with `<Root>` {#wrapper-your-site-with-root}
+
+The `<Root>` component is rendered at the **very top** of the React tree, above the theme `<Layout>`, and **never unmounts**. It is the perfect place to add stateful logic that should not be re-initialized across navigations (user authentication status, shopping card state...).
+
+Swizzle it **manually** by creating a file at `src/theme/Root.js`:
+
+```js title="src/theme/Root.js"
+import React from 'react';
+
+// Default implementation, that you can customize
+export default function Root({children}) {
+  return <>{children}</>;
+}
+```
+
+:::tip
+
+Use this component to render React Context providers.
+
+:::

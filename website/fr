@@ -1,140 +1,166 @@
 ---
-slug: /creating-pages
-sidebar_label: Pages
+id: create-doc
+description: Create a Markdown Document
+slug: /create-doc
 ---
 
-# Creating Pages
+# Create a doc
 
-In this section, we will learn about creating pages in Docusaurus.
-
-The `@docusaurus/plugin-content-pages` plugin empowers you to create **one-off standalone pages** like a showcase page, playground page, or support page. You can use React components, or Markdown.
-
-:::note
-
-Pages do not have sidebars, only [docs](./docs/docs-introduction.md) do.
-
-:::
-
-:::info
-
-Check the [Pages Plugin API Reference documentation](./../api/plugins/plugin-content-pages.md) for an exhaustive list of options.
-
-:::
-
-## Add a React page {#add-a-react-page}
-
-React is used as the UI library to create pages. Every page component should export a React component, and you can leverage the expressiveness of React to build rich and interactive content.
-
-Create a file `/src/pages/helloReact.js`:
-
-```jsx title="/src/pages/helloReact.js"
-import React from 'react';
-import Layout from '@theme/Layout';
-
-export default function Hello() {
-  return (
-    <Layout title="Hello" description="Hello React Page">
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          height: '50vh',
-          fontSize: '20px',
-        }}>
-        <p>
-          Edit <code>pages/helloReact.js</code> and save to reload.
-        </p>
-      </div>
-    </Layout>
-  );
-}
-```
-
-Once you save the file, the development server will automatically reload the changes. Now open [http://localhost:3000/helloReact](http://localhost:3000/helloReact) and you will see the new page you just created.
-
-Each page doesn't come with any styling. You will need to import the `Layout` component from `@theme/Layout` and wrap your contents within that component if you want the navbar and/or footer to appear.
-
-:::tip
-
-You can also create TypeScript pages with the `.tsx` extension (`helloReact.tsx`).
-
-:::
-
-## Add a Markdown page {#add-a-markdown-page}
-
-Create a file `/src/pages/helloMarkdown.md`:
-
-```md title="/src/pages/helloMarkdown.md"
----
-title: my hello page title
-description: my hello page description
-hide_table_of_contents: true
----
-
-# Hello
-
-How are you?
-```
-
-In the same way, a page will be created at [http://localhost:3000/helloMarkdown](http://localhost:3000/helloMarkdown).
-
-Markdown pages are less flexible than React pages because it always uses the theme layout.
-
-Here's an [example Markdown page](/examples/markdownPageExample).
-
-:::tip
-
-You can use the full power of React in Markdown pages too, refer to the [MDX](https://mdxjs.com/) documentation.
-
-:::
-
-## Routing {#routing}
-
-If you are familiar with other static site generators like Jekyll and Next, this routing approach will feel familiar to you. Any JavaScript file you create under `/src/pages/` directory will be automatically converted to a website page, following the `/src/pages/` directory hierarchy. For example:
-
-- `/src/pages/index.js` → `[baseUrl]`
-- `/src/pages/foo.js` → `[baseUrl]/foo`
-- `/src/pages/foo/test.js` → `[baseUrl]/foo/test`
-- `/src/pages/foo/index.js` → `[baseUrl]/foo/`
-
-In this component-based development era, it is encouraged to co-locate your styling, markup, and behavior together into components. Each page is a component, and if you need to customize your page design with your own styles, we recommend co-locating your styles with the page component in its own directory. For example, to create a "Support" page, you could do one of the following:
-
-- Add a `/src/pages/support.js` file
-- Create a `/src/pages/support/` directory and a `/src/pages/support/index.js` file.
-
-The latter is preferred as it has the benefits of letting you put files related to the page within that directory. For example, a CSS module file (`styles.module.css`) with styles meant to only be used on the "Support" page.
-
-:::note
-
-This is merely a recommended directory structure, and you will still need to manually import the CSS module file within your component module (`support/index.js`).
-
-:::
-
-By default, any Markdown or JavaScript file starting with `_` will be ignored and no routes will be created for that file (see the `exclude` option).
+Create a Markdown file, `greeting.md`, and place it under the `docs` directory.
 
 ```bash
-my-website
+website # root directory of your site
+├── docs
+│   └── greeting.md
 ├── src
 │   └── pages
-│       ├── styles.module.css
-│       ├── index.js
-│       ├── _ignored.js
-│       ├── _ignored-folder
-│       │   ├── Component1.js
-│       │   └── Component2.js
-│       └── support
-│           ├── index.js
-│           └── styles.module.css
-.
+├── docusaurus.config.js
+├── ...
 ```
 
-:::caution
+```md
+---
+description: Create a doc page with rich content.
+---
 
-All JavaScript/TypeScript files within the `src/pages/` directory will have corresponding website paths generated for them. If you want to create reusable components into that directory, use the `exclude` option (by default, files prefixed with `_`, test files(`.test.js`), and files in `__tests__` directory are not turned into pages).
+# Hello from Docusaurus
+
+Are you ready to create the documentation site for your open source project?
+
+## Headers
+
+will show up on the table of contents on the upper right
+
+So that your users will know what this page is all about without scrolling down or even without reading too much.
+
+## Only h2 and h3 will be in the TOC by default.
+
+You can configure the TOC heading levels either per-document or in the theme configuration.
+
+The headers are well-spaced so that the hierarchy is clear.
+
+- lists will help you
+- present the key points
+- that you want your users to remember
+  - and you may nest them
+    - multiple times
+
+## Custom ID headers {#custom-id}
+
+With `{#custom-id}` syntax you can set your own header ID.
+```
+
+:::note
+
+All files prefixed with an underscore (`_`) under the `docs` directory are treated as "partial" pages and will be ignored by default.
+
+Read more about [importing partial pages](../markdown-features/markdown-features-react.mdx#importing-markdown).
 
 :::
 
-### Duplicate Routes {#duplicate-routes}
+## Doc front matter {#doc-front-matter}
 
-You may accidentally create multiple pages that are meant to be accessed on the same route. When this happens, Docusaurus will warn you about duplicate routes when you run `yarn start` or `yarn build`, but the site will still be built successfully. The page that was created last will be accessible, but it will override other conflicting pages. To resolve this issue, you should modify or remove any conflicting routes.
+The [front matter](../markdown-features/markdown-features-intro.mdx#front-matter) is used to provide additional metadata for your doc page. Front matter is optional—Docusaurus will be able to infer all necessary metadata without the front matter. For example, the [doc tags](#dog-tags) feature introduced below requires using front matter. For all possible fields, see [the API documentation](../../api/plugins/plugin-content-docs.md#markdown-front-matter).
+
+## Doc tags {#doc-tags}
+
+Optionally, you can add tags to your doc pages, which introduces another dimension of categorization in addition to the [docs sidebar](./sidebar/index.md). Tags are passed in the front matter as a list of labels:
+
+```md "your-doc-page.md"
+---
+id: doc-with-tags
+title: A doc with tags
+tags:
+  - Demo
+  - Getting started
+---
+```
+
+:::tip
+
+Tags can also be declared with `tags: [Demo, Getting started]`.
+
+Read more about all the possible [Yaml array syntaxes](https://www.w3schools.io/file/yaml-arrays/).
+
+:::
+
+## Organizing folder structure {#organizing-folder-structure}
+
+How the Markdown files are arranged under the `docs` folder can have multiple impacts on Docusaurus content generation. However, most of them can be decoupled from the file structure.
+
+### Document ID {#document-id}
+
+Every document has a unique `id`. By default, a document `id` is the name of the document (without the extension) relative to the root docs directory.
+
+For example, the ID of `greeting.md` is `greeting`, and the ID of `guide/hello.md` is `guide/hello`.
+
+```bash
+website # Root directory of your site
+└── docs
+   ├── greeting.md
+   └── guide
+      └── hello.md
+```
+
+However, the **last part** of the `id` can be defined by the user in the front matter. For example, if `guide/hello.md`'s content is defined as below, its final `id` is `guide/part1`.
+
+```md
+---
+id: part1
+---
+
+Lorem ipsum
+```
+
+The ID is used to refer to a document when hand-writing sidebars, or when using docs-related layout components or hooks.
+
+### Doc URLs {#doc-urls}
+
+By default, a document's URL location is its file path relative to the `docs` folder. Use the `slug` front matter to change a document's URL.
+
+For example, suppose your site structure looks like this:
+
+```bash
+website # Root directory of your site
+└── docs
+    └── guide
+        └── hello.md
+```
+
+By default `hello.md` will be available at `/docs/guide/hello`. You can change its URL location to `/docs/bonjour`:
+
+```md
+---
+slug: /bonjour
+---
+
+Lorem ipsum
+```
+
+`slug` will be appended to the doc plugin's `routeBasePath`, which is `/docs` by default. See [Docs-only mode](docs-introduction.md#docs-only-mode) for how to remove the `/docs` part from the URL.
+
+:::note
+
+It is possible to use:
+
+- absolute slugs: `slug: /mySlug`, `slug: /`...
+- relative slugs: `slug: mySlug`, `slug: ./../mySlug`...
+
+:::
+
+If you want a document to be available at the root, and have a path like `https://docusaurus.io/docs/`, you can use the slug front matter:
+
+```md
+---
+id: my-home-doc
+slug: /
+---
+
+Lorem ipsum
+```
+
+### Sidebars {#sidebars}
+
+When using [autogenerated sidebars](./sidebar/autogenerated.md), the file structure will determine the sidebar structure.
+
+Our recommendation for file system organization is: make your file system mirror the sidebar structure (so you don't need to handwrite your `sidebars.js` file), and use the `slug` front matter to customize URLs of each document.

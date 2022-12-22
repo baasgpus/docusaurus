@@ -1,144 +1,286 @@
 ---
-slug: /sidebar/multiple-sidebars
+slug: /versioning
 ---
 
-# Using multiple sidebars
+# Versioning
 
-You can create a sidebar for each **set of Markdown files** that you want to **group together**.
+You can use the versioning CLI to create a new documentation version based on the latest content in the `docs` directory. That specific set of documentation will then be preserved and accessible even as the documentation in the `docs` directory continues to evolve.
 
-:::tip
+```mdx-code-block
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+```
 
-The Docusaurus site is a good example of using multiple sidebars:
+:::caution
 
-- [Docs](../../../introduction.md)
-- [API](../../../cli.md)
+Think about it before starting to version your documentation - it can become difficult for contributors to help improve it!
 
 :::
 
-Consider this example:
+Most of the time, you don't need versioning as it will just increase your build time, and introduce complexity to your codebase. Versioning is **best suited for websites with high-traffic and rapid changes to documentation between versions**. If your documentation rarely changes, don't add versioning to your documentation.
 
-```js title="sidebars.js"
+To better understand how versioning works and see if it suits your needs, you can read on below.
+
+## Overview {#overview}
+
+A typical versioned doc site looks like below:
+
+```bash
+website
+├── sidebars.json        # sidebar for the current docs version
+├── docs                 # docs directory for the current docs version
+│   ├── foo
+│   │   └── bar.md       # https://mysite.com/docs/next/foo/bar
+│   └── hello.md         # https://mysite.com/docs/next/hello
+├── versions.json        # file to indicate what versions are available
+├── versioned_docs
+│   ├── version-1.1.0
+│   │   ├── foo
+│   │   │   └── bar.md   # https://mysite.com/docs/foo/bar
+│   │   └── hello.md
+│   └── version-1.0.0
+│       ├── foo
+│       │   └── bar.md   # https://mysite.com/docs/1.0.0/foo/bar
+│       └── hello.md
+├── versioned_sidebars
+│   ├── version-1.1.0-sidebars.json
+│   └── version-1.0.0-sidebars.json
+├── docusaurus.config.js
+└── package.json
+```
+
+The `versions.json` file is a list of version names, ordered from newest to oldest.
+
+The table below explains how a versioned file maps to its version and the generated URL.
+
+| Path                                    | Version        | URL               |
+| --------------------------------------- | -------------- | ----------------- |
+| `versioned_docs/version-1.0.0/hello.md` | 1.0.0          | /docs/1.0.0/hello |
+| `versioned_docs/version-1.1.0/hello.md` | 1.1.0 (latest) | /docs/hello       |
+| `docs/hello.md`                         | current        | /docs/next/hello  |
+
+:::tip
+
+The files in the `docs` directory belong to the `current` docs version.
+
+By default, the `current` docs version is labeled as `Next` and hosted under `/docs/next/*`, but it is entirely configurable to fit your project's release lifecycle.
+
+:::
+
+### Terminology {#terminology}
+
+Note the terminology we use here.
+
+<dl>
+<dt><b>Current version</b></dt>
+<dd>The version placed in the <code>./docs</code> folder.</dd>
+<dt><b>Latest version / last version</b></dt>
+<dd>The version served by default for docs navbar items. Usually has path <code>/docs</code>.</dd>
+</dl>
+
+Current version is defined by the **file system location**, while latest version is defined by the **the navigation behavior**. They may or may not be the same version! (And the default configuration, as shown in the table above, would treat them as different: current version at `/docs/next` and latest at `/docs`.)
+
+## Tutorials {#tutorials}
+
+### Tagging a new version {#tagging-a-new-version}
+
+1. First, make sure the current docs version (the `./docs` directory) is ready to be frozen.
+2. Enter a new version number.
+
+```bash npm2yarn
+npm run docusaurus docs:version 1.1.0
+```
+
+When tagging a new version, the document versioning mechanism will:
+
+- Copy the full `docs/` folder contents into a new `versioned_docs/version-[versionName]/` folder.
+- Create a versioned sidebars file based from your current [sidebar](docs-introduction.md#sidebar) configuration (if it exists) - saved as `versioned_sidebars/version-[versionName]-sidebars.json`.
+- Append the new version number to `versions.json`.
+
+### Creating new docs {#creating-new-docs}
+
+1. Place the new file into the corresponding version folder.
+2. Include the reference to the new file in the corresponding sidebar file according to the version number.
+
+```mdx-code-block
+<Tabs>
+<TabItem value="Current version structure">
+```
+
+```bash
+# The new file.
+docs/new.md
+
+# Edit the corresponding sidebar file.
+sidebars.js
+```
+
+```mdx-code-block
+</TabItem>
+<TabItem value="Older version structure">
+```
+
+```bash
+# The new file.
+versioned_docs/version-1.0.0/new.md
+
+# Edit the corresponding sidebar file.
+versioned_sidebars/version-1.0.0-sidebars.json
+```
+
+```mdx-code-block
+</TabItem>
+</Tabs>
+```
+
+### Updating an existing version {#updating-an-existing-version}
+
+You can update multiple docs versions at the same time because each directory in `versioned_docs/` represents specific routes when published.
+
+1. Edit any file.
+2. Commit and push changes.
+3. It will be published to the version.
+
+Example: When you change any file in `versioned_docs/version-2.6/`, it will only affect the docs for version `2.6`.
+
+### Deleting an existing version {#deleting-an-existing-version}
+
+You can delete/remove versions as well.
+
+1. Remove the version from `versions.json`.
+
+Example:
+
+```diff
+[
+  "2.0.0",
+  "1.9.0",
+  // highlight-next-line
+- "1.8.0"
+]
+```
+
+2. Delete the versioned docs directory. Example: `versioned_docs/version-1.8.0`.
+3. Delete the versioned sidebars file. Example: `versioned_sidebars/version-1.8.0-sidebars.json`.
+
+## Configuring versioning behavior {#configuring-versioning-behavior}
+
+The "current" version is the version name for the `./docs` folder. There are different ways to manage versioning, but two very common patterns are:
+
+- You release v1, and start immediately working on v2 (including its docs). In this case, the **current version** is v2, which is in the `./docs` source folder, and can be browsed at `example.com/docs/next`. The **latest version** is v1, which is in the `./versioned_docs/version-1` source folder, and is browsed by most of your users at `example.com/docs`.
+- You release v1, and will maintain it for some time before thinking about v2. In this case, the **current version** and **latest version** will both be point to v1, since the v2 docs doesn't even exist yet!
+
+Docusaurus defaults work great for the first use case. We will label the current version as "next" and you can even choose not to publish it.
+
+**For the 2nd use case**: if you release v1 and don't plan to work on v2 anytime soon, instead of versioning v1 and having to maintain the docs in 2 folders (`./docs` + `./versioned_docs/version-1.0.0`), you may consider "pretending" that the current version is a cut version by giving it a path and a label:
+
+```js title="docusaurus.config.js"
 module.exports = {
-  tutorialSidebar: {
-    'Category A': ['doc1', 'doc2'],
-  },
-  apiSidebar: ['doc3', 'doc4'],
-};
-```
-
-When browsing `doc1` or `doc2`, the `tutorialSidebar` will be displayed; when browsing `doc3` or `doc4`, the `apiSidebar` will be displayed.
-
-## Understanding sidebar association {#sidebar-association}
-
-Following the example above, if a `commonDoc` is included in both sidebars:
-
-```js title="sidebars.js"
-module.exports = {
-  tutorialSidebar: {
-    'Category A': ['doc1', 'doc2', 'commonDoc'],
-  },
-  apiSidebar: ['doc3', 'doc4', 'commonDoc'],
-};
-```
-
-How does Docusaurus know which sidebar to display when browsing `commonDoc`? Answer: it doesn't, and we don't guarantee which sidebar it will pick.
-
-When you add doc Y to sidebar X, it creates a two-way binding: sidebar X contains a link to doc Y, and when browsing doc Y, sidebar X will be displayed. But sometimes, we want to break either implicit binding:
-
-1. _How do I generate a link to doc Y in sidebar X without making sidebar X displayed on Y?_ For example, when I include doc Y in multiple sidebars as in the example above, and I want to explicitly tell Docusaurus to display one sidebar?
-2. _How do I make sidebar X displayed when browsing doc Y, but sidebar X shouldn't contain the link to Y?_ For example, when Y is a "doc home page" and the sidebar is purely used for navigation?
-
-Front matter option `displayed_sidebar` will forcibly set the sidebar association. For the same example, you can still use doc shorthands without any special configuration:
-
-```js title="sidebars.js"
-module.exports = {
-  tutorialSidebar: {
-    'Category A': ['doc1', 'doc2'],
-  },
-  apiSidebar: ['doc3', 'doc4'],
-};
-```
-
-And then add a front matter:
-
-```md title="commonDoc.md"
----
-displayed_sidebar: apiSidebar
----
-```
-
-Which explicitly tells Docusaurus to display `apiSidebar` when browsing `commonDoc`. Using the same method, you can make sidebar X which doesn't contain doc Y appear on doc Y:
-
-```md title="home.md"
----
-displayed_sidebar: tutorialSidebar
----
-```
-
-Even when `tutorialSidebar` doesn't contain a link to `home`, it will still be displayed when viewing `home`.
-
-If you set `displayed_sidebar: null`, no sidebar will be displayed whatsoever on this page, and subsequently, no pagination either.
-
-## Generating pagination {#generating-pagination}
-
-Docusaurus uses the sidebar to generate the "next" and "previous" pagination links at the bottom of each doc page. It strictly uses the sidebar that is displayed: if no sidebar is associated, it doesn't generate pagination either. However, the docs linked as "next" and "previous" are not guaranteed to display the same sidebar: they are included in this sidebar, but in their front matter, they may have a different `displayed_sidebar`.
-
-If a sidebar is displayed by setting `displayed_sidebar` front matter, and this sidebar doesn't contain the doc itself, no pagination is displayed.
-
-You can customize pagination with front matter `pagination_next` and `pagination_prev`. Consider this sidebar:
-
-```js title="sidebars.js"
-module.exports = {
-  tutorial: [
-    'introduction',
-    {
-      installation: ['windows', 'linux', 'macos'],
+  presets: [
+    '@docusaurus/preset-classic',
+    docs: {
+      // highlight-start
+      lastVersion: 'current',
+      versions: {
+        current: {
+          label: '1.0.0',
+          path: '1.0.0',
+        },
+      },
+      // highlight-end
     },
-    'getting-started',
   ],
 };
 ```
 
-The pagination next link on "windows" points to "linux", but that doesn't make sense: you would want readers to proceed to "getting started" after installation. In this case, you can set the pagination manually:
+The docs in `./docs` will be served at `/docs/1.0.0` instead of `/docs/next`, and `1.0.0` will become the default version we link to in the navbar dropdown, and you will only need to maintain a single `./docs` folder.
 
-```md title="windows.md"
----
-# highlight-next-line
-pagination_next: getting-started
----
+We offer these plugin options to customize versioning behavior:
 
-# Installation on Windows
+- `disableVersioning`: Explicitly disable versioning even with versions. This will make the site only include the current version.
+- `includeCurrentVersion`: Include the current version (the `./docs` folder) of your docs.
+  - **Tip**: turn it off if the current version is a work-in-progress, not ready to be published.
+- `lastVersion`: Sets which version "latest version" (the `/docs` route) refers to.
+  - **Tip**: `lastVersion: 'current'` makes sense if your current version refers to a major version that's constantly patched and released. The actual route base path and label of the latest version are configurable.
+- `onlyIncludeVersions`: Defines a subset of versions from `versions.json` to be deployed.
+  - **Tip**: limit to 2 or 3 versions in dev and deploy previews to improve startup and build time.
+- `versions`: A dictionary of version metadata. For each version, you can customize the following:
+  - `label`: the label displayed in the versions dropdown and banner.
+  - `path`: the route base path of this version. By default, latest version has `/` and current version has `/next`.
+  - `banner`: one of `'none'`, `'unreleased'`, and `'unmaintained'`. Determines what's displayed at the top of every doc page. Any version above the latest version would be "unreleased", and any version below would be "unmaintained".
+  - `badge`: show a badge with the version name at the top of a doc of that version.
+  - `className`: add a custom `className` to the `<html>` element of doc pages of that version.
+
+See [docs plugin configuration](../../api/plugins/plugin-content-docs.md#configuration) for more details.
+
+## Navbar items {#navbar-items}
+
+We offer several navbar items to help you quickly set up navigation without worrying about versioned routes.
+
+- [`doc`](../../api/themes/theme-configuration.md#navbar-doc-link): a link to a doc.
+- [`docSidebar`](../../api/themes/theme-configuration.md#navbar-doc-sidebar): a link to the first item in a sidebar.
+- [`docsVersion`](../../api/themes/theme-configuration.md#navbar-docs-version): a link to the main doc of the currently viewed version.
+- [`docsVersionDropdown`](../../api/themes/theme-configuration.md#navbar-docs-version-dropdown): a dropdown containing all the versions available.
+
+These links would all look for an appropriate version to link to, in the following order:
+
+1. **Active version**: the version that the user is currently browsing, if she is on a page provided by this doc plugin. If she's not on a doc page, fall back to...
+2. **Preferred version**: the version that the user last viewed. If there's no history, fall back to...
+3. **Latest version**: the default version that we navigate to, configured by the `lastVersion` option.
+
+## Recommended practices {#recommended-practices}
+
+### Version your documentation only when needed {#version-your-documentation-only-when-needed}
+
+For example, you are building documentation for your npm package `foo` and you are currently in version 1.0.0. You then release a patch version for a minor bug fix and it's now 1.0.1.
+
+Should you cut a new documentation version 1.0.1? **You probably shouldn't**. 1.0.1 and 1.0.0 docs shouldn't differ according to semver because there are no new features!. Cutting a new version for it will only just create unnecessary duplicated files.
+
+### Keep the number of versions small {#keep-the-number-of-versions-small}
+
+As a good rule of thumb, try to keep the number of your versions below 10. You will **very likely** to have a lot of obsolete versioned documentation that nobody even reads anymore. For example, [Jest](https://jestjs.io/versions) is currently in version `27.4`, and only maintains several latest documentation versions with the lowest being `25.X`. Keep it small 😊
+
+:::tip archive older versions
+
+If you deploy your site on a Jamstack provider (e.g. [Netlify](../../deployment.mdx)), the provider will save each production build as a snapshot under an immutable URL. You can include archived versions that will never be rebuilt as external links to these immutable URLs. The Jest website and the Docusaurus website both use such pattern to keep the number of actively built versions low.
+
+:::
+
+### Use absolute import within the docs {#use-absolute-import-within-the-docs}
+
+Don't use relative paths import within the docs. Because when we cut a version the paths no longer work (the nesting level is different, among other reasons). You can utilize the `@site` alias provided by Docusaurus that points to the `website` directory. Example:
+
+```diff
+- import Foo from '../src/components/Foo';
++ import Foo from '@site/src/components/Foo';
 ```
 
-You can also disable displaying a pagination link with `pagination_next: null` or `pagination_prev: null`.
+### Link docs by file paths {#link-docs-by-file-paths}
 
-The pagination label by default is the sidebar label. You can use the front matter `pagination_label` to customize how this doc appears in the pagination.
+Refer to other docs by relative file paths with the `.md` extension, so that Docusaurus can rewrite them to actual URL paths during building. Files will be linked to the correct corresponding version.
 
-## The `ref` item {#sidebar-item-ref}
+```md
+The [@hello](hello.md#paginate) document is great!
 
-The `ref` type is identical to the [`doc` type](#sidebar-item-doc) in every way, except that it doesn't participate in generating navigation metadata. It only registers itself as a link. When [generating pagination](#generating-pagination) and [displaying sidebar](#sidebar-association), `ref` items are completely ignored.
-
-It is particularly useful where you wish to link to the same document from multiple sidebars. The document only belongs to one sidebar (the one where it's registered as `type: 'doc'` or from an autogenerated directory), but its link will appear in all sidebars that it's registered in.
-
-Consider this example:
-
-```js title="sidebars.js"
-module.exports = {
-  tutorialSidebar: {
-    'Category A': [
-      'doc1',
-      'doc2',
-      // highlight-next-line
-      {type: 'ref', id: 'commonDoc'},
-      'doc5',
-    ],
-  },
-  apiSidebar: ['doc3', 'doc4', 'commonDoc'],
-};
-}
+See the [Tutorial](../getting-started/tutorial.md) for more info.
 ```
 
-You can think of the `ref` type as the equivalent to doing the following:
+### Global or versioned collocated assets {#global-or-versioned-collocated-assets}
 
-- Setting `displayed_sidebar: tutorialSidebar` for `commonDoc` (`ref` is ignored in sidebar association)
-- Setting `pagination_next: doc5` for `doc2` and setting `pagination_prev: doc2` for `doc5` (`ref` is ignored in pagination generation)
+You should decide if assets like images and files are per-version or shared between versions.
+
+If your assets should be versioned, put them in the docs version, and use relative paths:
+
+```md
+![img alt](./myImage.png)
+
+[download this file](./file.pdf)
+```
+
+If your assets are global, put them in `/static` and use absolute paths:
+
+```md
+![img alt](/myImage.png)
+
+[download this file](/file.pdf)
+```

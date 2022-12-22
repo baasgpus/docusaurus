@@ -1,20 +1,8 @@
 ---
-title: Blog post MDX require Feed tests
-authors:
-  - slorber
-tags: '[ paginated-tag, blog, docusaurus, long-long, long-long-long, long-long-long-long, ] ---'
+tags:
+  - paginated-tag
 ---
 
-Some MDX tests, mostly to test how the RSS feed render those
+# Post with duplicate title
 
-<!-- truncate -->
-
-Test MDX with require calls
-
-import useBaseUrl from '@docusaurus/useBaseUrl';
-
-<img src={useBaseUrl('/img/docusaurus.png')} />
-
-<img src={require('../../static/img/docusaurus.png').default} />
-
-<img src={require('@site/static/img/docusaurus.png').default} />
+I hope I'm still here

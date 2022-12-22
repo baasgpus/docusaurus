@@ -5,53 +5,92 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-.checkboxLabel {
-  --height: 25px;
-  --width: 80px;
-  --border: 2px;
-  display: flex;
-  width: var(--width);
-  height: var(--height);
-  position: relative;
-  border-radius: var(--height);
-  border: var(--border) solid var(--ifm-color-primary-darkest);
-  cursor: pointer;
-  justify-content: space-around;
-  opacity: 0.75;
-  transition: opacity var(--ifm-transition-fast)
-    var(--ifm-transition-timing-default);
-  box-shadow: var(--ifm-global-shadow-md);
+import React, {
+  useCallback,
+  useState,
+  useEffect,
+  type ComponentProps,
+  type ReactNode,
+  type ReactElement,
+} from 'react';
+import {useHistory, useLocation} from '@docusaurus/router';
+import {toggleListItem} from '@site/src/utils/jsUtils';
+import type {TagType} from '@site/src/data/users';
+
+import {prepareUserState} from '../../index';
+import styles from './styles.module.css';
+
+interface Props extends ComponentProps<'input'> {
+  icon: ReactElement<ComponentProps<'svg'>>;
+  label: ReactNode;
+  tag: TagType;
 }
 
-.checkboxLabel:hover {
-  opacity: 1;
-  box-shadow: var(--ifm-global-shadow-md),
-    0 0 2px 1px var(--ifm-color-primary-dark);
+const TagQueryStringKey = 'tags';
+
+export function readSearchTags(search: string): TagType[] {
+  return new URLSearchParams(search).getAll(TagQueryStringKey) as TagType[];
 }
 
-.checkboxLabel::after {
-  position: absolute;
-  content: '';
-  inset: 0;
-  width: calc(var(--width) / 2);
-  height: 100%;
-  border-radius: var(--height);
-  background-color: var(--ifm-color-primary-darkest);
-  transition: transform var(--ifm-transition-fast)
-    var(--ifm-transition-timing-default);
-  transform: translateX(calc(var(--width) / 2 - var(--border)));
+function replaceSearchTags(search: string, newTags: TagType[]) {
+  const searchParams = new URLSearchParams(search);
+  searchParams.delete(TagQueryStringKey);
+  newTags.forEach((tag) => searchParams.append(TagQueryStringKey, tag));
+  return searchParams.toString();
 }
 
-input:focus-visible ~ .checkboxLabel::after {
-  outline: 2px solid currentColor;
+function ShowcaseTagSelect(
+  {id, icon, label, tag, ...rest}: Props,
+  ref: React.ForwardedRef<HTMLLabelElement>,
+) {
+  const location = useLocation();
+  const history = useHistory();
+  const [selected, setSelected] = useState(false);
+  useEffect(() => {
+    const tags = readSearchTags(location.search);
+    setSelected(tags.includes(tag));
+  }, [tag, location]);
+  const toggleTag = useCallback(() => {
+    const tags = readSearchTags(location.search);
+    const newTags = toggleListItem(tags, tag);
+    const newSearch = replaceSearchTags(location.search, newTags);
+    history.push({
+      ...location,
+      search: newSearch,
+      state: prepareUserState(),
+    });
+  }, [tag, location, history]);
+  return (
+    <>
+      <input
+        type="checkbox"
+        id={id}
+        className="screen-reader-only"
+        onKeyDown={(e) => {
+          if (e.key === 'Enter') {
+            toggleTag();
+          }
+        }}
+        onFocus={(e) => {
+          if (e.relatedTarget) {
+            e.target.nextElementSibling?.dispatchEvent(
+              new KeyboardEvent('focus'),
+            );
+          }
+        }}
+        onBlur={(e) => {
+          e.target.nextElementSibling?.dispatchEvent(new KeyboardEvent('blur'));
+        }}
+        onChange={toggleTag}
+        checked={selected}
+        {...rest}
+      />
+      <label ref={ref} htmlFor={id} className={styles.checkboxLabel}>
+        {label}
+        {icon}
+      </label>
+    </>
+  );
 }
 
-.checkboxLabel > * {
-  font-size: 0.8rem;
-  color: inherit;
-  transition: opacity 150ms ease-in 50ms;
-}
-
-input:checked ~ .checkboxLabel::after {
-  transform: translateX(calc(-1 * var(--border)));
-}
+export default React.forwardRef(ShowcaseTagSelect);

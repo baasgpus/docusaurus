@@ -1,9 +1,10 @@
 ---
+unlisted: true
 tags:
   - visibility
-  - listed
+  - unlisted
 ---
 
-# Some Unlisteds - Listed 1
+# Some Unlisteds - Unlisted 3
 
-Regular doc
+Doc with unlisted front matter

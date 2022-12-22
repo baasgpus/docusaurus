@@ -1,25 +1,20 @@
 ---
-sidebar_position: 5
-slug: /api/themes/@docusaurus/theme-mermaid
+sidebar_position: 4
+slug: /api/themes/@docusaurus/theme-search-algolia
 ---
 
-# 📦 theme-mermaid
+# 📦 theme-search-algolia
 
-This theme provides a `@theme/Mermaid` component that is powered by [mermaid](https://mermaid-js.github.io/). You can read more on [diagrams](../../guides/markdown-features/markdown-features-diagrams.mdx) documentation.
+This theme provides a `@theme/SearchBar` component that integrates with Algolia DocSearch easily. Combined with `@docusaurus/theme-classic`, it provides a very easy search integration. You can read more on [search](../../search.md) documentation.
 
 ```bash npm2yarn
-npm install --save @docusaurus/theme-mermaid
+npm install --save @docusaurus/theme-search-algolia
 ```
 
-## Configuration {#configuration}
+This theme also adds search page available at `/search` (as swizzlable `SearchPage` component) path with OpenSearch support. You can change this default path via `themeConfig.algolia.searchPagePath`. Use `false` to disable search page.
 
-```js title="docusaurus.config.js"
-module.exports = {
-  themes: ['@docusaurus/theme-mermaid'],
-  // In order for Mermaid code blocks in Markdown to work,
-  // you also need to enable the Remark plugin with this option
-  markdown: {
-    mermaid: true,
-  },
-};
-```
+:::tip
+
+If you have installed `@docusaurus/preset-classic`, you don't need to install it as a dependency.
+
+:::

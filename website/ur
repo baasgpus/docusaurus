@@ -1,7 +1,7 @@
 ---
-last_update:
-  author: custom author
-  date: 1/1/2000
+displayed_sidebar:
 ---
 
-# Doc With Last Update Front Matter
+# Doc without sidebar
+
+My link appears in a sidebar, but I don't want to display that...

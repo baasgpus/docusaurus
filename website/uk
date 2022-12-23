@@ -1,73 +1,45 @@
 ---
-sidebar_position: 1
-slug: /api/misc/@docusaurus/eslint-plugin
+slug: /api/misc/@docusaurus/eslint-plugin/no-html-links
 ---
 
-# 📦 eslint-plugin
+# no-html-links
 
-[ESLint](https://eslint.org/) is a tool that statically analyzes your code and reports problems or suggests best practices through editor hints and command line. Docusaurus provides an ESLint plugin to enforce best Docusaurus practices.
+Ensure that the Docusaurus [`<Link>`](../../../docusaurus-core.md#link) component is used instead of `<a>` tags.
 
-## Installation
+The `<Link>` component has prefetching and preloading built-in. It also does build-time broken link detection, and helps Docusaurus understand your site's structure better.
 
-```bash npm2yarn
-npm install --save-dev @docusaurus/eslint-plugin
+## Rule Details {#details}
+
+Examples of **incorrect** code for this rule:
+
+```html
+<a href="/page">go to page!</a>
+
+<a href="https://twitter.com/docusaurus" target="_blank">Twitter</a>
 ```
 
-## Usage
+Examples of **correct** code for this rule:
 
-### Recommended config
+```js
+import Link from '@docusaurus/Link'
 
-Add `plugin:@docusaurus/recommended` to the `extends` section of your `.eslintrc` configuration file:
+<Link to="/page">go to page!</Link>
 
-```json title=".eslintrc"
-{
-  "extends": ["plugin:@docusaurus/recommended"]
-}
+<Link to="https://twitter.com/docusaurus">Twitter</Link>
 ```
 
-This will enable the `@docusaurus` eslint plugin and use the `recommended` config. See [Supported rules](#supported-rules) below for a list of rules that this will enable.
+## Rule Configuration {#configuration}
 
-### Manual config
+Accepted fields:
 
-For more fine-grained control, you can also enable the plugin manually and configure the rules you want to use directly:
-
-```json title=".eslintrc"
-{
-  "plugins": ["@docusaurus"],
-  "rules": {
-    "@docusaurus/string-literal-i18n-messages": "error",
-    "@docusaurus/no-untranslated-text": "warn"
-  }
-}
+```mdx-code-block
+<APITable>
 ```
 
-## Supported configs
+| Option                | Type      | Default | Description                                                                               |
+| --------------------- | --------- | ------- | ----------------------------------------------------------------------------------------- |
+| `ignoreFullyResolved` | `boolean` | `false` | Set to true will not report any `<a>` tags with absolute URLs including a protocol. |
 
-- Recommended: recommended rule set for most Docusaurus sites that should be extended from.
-- All: **all** rules enabled. This will change between minor versions, so you should not use this if you want to avoid unexpected breaking changes.
-
-## Supported rules
-
-| Name                                                                            | Description                                                  |   |
-| ------------------------------------------------------------------------------- | ------------------------------------------------------------ | - |
-| [`@docusaurus/no-untranslated-text`](./no-untranslated-text.md)                 | Enforce text labels in JSX to be wrapped by translate calls  |   |
-| [`@docusaurus/string-literal-i18n-messages`](./string-literal-i18n-messages.md) | Enforce translate APIs to be called on plain text labels     | ✅ |
-| [`@docusaurus/no-html-links`](./no-html-links.md)                               | Ensures @docusaurus/Link is used instead of `<a>` tags | ✅ |
-
-✅ = recommended
-
-## Example configuration
-
-Here's an example configuration:
-
-```js title=".eslintrc.js"
-module.exports = {
-  extends: ['plugin:@docusaurus/recommended'],
-  rules: {
-    '@docusaurus/no-untranslated-text': [
-      'warn',
-      {ignoredStrings: ['·', '—', '×']},
-    ],
-  },
-};
+```mdx-code-block
+</APITable>
 ```

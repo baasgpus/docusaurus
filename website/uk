@@ -1,181 +1,137 @@
 ---
-id: git
-slug: /i18n/git
+id: introduction
+slug: /i18n/introduction
 ---
 
-# i18n - Using git
+# i18n - Introduction
 
-A **possible translation strategy** is to **version control the translation files** with Git (or any other [VCS](https://en.wikipedia.org/wiki/Version_control)).
+It is **easy to translate a Docusaurus website** with its internationalization ([i18n](https://en.wikipedia.org/wiki/Internationalization_and_localization)) support.
 
-## Tradeoffs {#tradeoffs}
+## Goals {#goals}
 
-This strategy has advantages:
+It is important to understand the **design decisions** behind the Docusaurus i18n support.
 
-- **Easy to get started**: just commit the `i18n` folder to Git
-- **Easy for developers**: Git, GitHub and pull requests are mainstream developer tools
-- **Free** (or without any additional cost, assuming you already use Git)
-- **Low friction**: does not require signing up to an external tool
-- **Rewarding**: contributors are happy to have a nice contribution history
+For more context, you can read the initial [RFC](https://github.com/facebook/docusaurus/issues/3317) and [PR](https://github.com/facebook/docusaurus/pull/3325).
 
-Using Git also present some shortcomings:
+### i18n goals {#i18n-goals}
 
-- **Hard for non-developers**: they do not master Git and pull-requests
-- **Hard for professional translators**: they are used to SaaS translation softwares and advanced features
-- **Hard to maintain**: you have to keep the translated files **in sync** with the untranslated files
+The goals of the Docusaurus i18n system are:
 
-:::note
+- **Simple**: just put the translated files in the correct filesystem location
+- **Flexible translation workflows**: use Git (monorepo, forks, or submodules), SaaS software, FTP
+- **Flexible deployment options**: single, multiple domains, or hybrid
+- **Modular**: allow plugin authors to provide i18n support
+- **Low-overhead runtime**: documentation is mostly static and does not require heavy JS libraries or polyfills
+- **Scalable build-times**: allow building and deploying localized sites independently
+- **Localize assets**: an image of your site might contain text that should be translated
+- **No coupling**: not forced to use any SaaS, yet integrations are possible
+- **Easy to use with [Crowdin](https://crowdin.com/)**: a lot of Docusaurus v1 sites use Crowdin and should be able to migrate to v2
+- **Good SEO defaults**: we set useful SEO headers like [`hreflang`](https://developers.google.com/search/docs/advanced/crawling/localized-versions) for you
+- **RTL support**: locales reading right-to-left (Arabic, Hebrew, etc.) are supported and easy to implement
+- **Default translations**: classic theme labels are translated for you in [many languages](https://github.com/facebook/docusaurus/tree/main/packages/docusaurus-theme-translations/locales)
 
-Some **large-scale technical projects** (React, Vue.js, MDN, TypeScript, Nuxt.js, etc.) use Git for translations.
+### i18n non-goals {#i18n-non-goals}
 
-Refer to the [Docusaurus i18n RFC](https://github.com/facebook/docusaurus/issues/3317) for our notes and links studying these systems.
+We don't provide support for:
 
-:::
+- **Automatic locale detection**: opinionated, and best done on the [server (your hosting provider)](../deployment.mdx)
+- **Translation SaaS software**: you are responsible to understand the external tools of your choice
+- **Translation of slugs**: technically complicated, little SEO value
 
-## Initialization {#initialization}
+## Translation workflow {#translation-workflow}
 
-This is a walk-through of using Git to translate a newly initialized English Docusaurus website into French, and assume you already followed the [i18n tutorial](./i18n-tutorial.md).
+### Overview {#overview}
 
-### Prepare the Docusaurus site {#prepare-the-docusaurus-site}
+Overview of the workflow to create a translated Docusaurus website:
 
-Initialize a new Docusaurus site:
+1. **Configure**: declare the default locale and alternative locales in `docusaurus.config.js`
+2. **Translate**: put the translation files at the correct filesystem location
+3. **Deploy**: build and deploy your site using a single or multi-domain strategy
 
-```bash
-npx create-docusaurus@latest website classic
-```
+### Translation files {#translation-files}
 
-Add the site configuration for the French language:
+You will work with three kinds of translation files.
 
-```js title="docusaurus.config.js"
-module.exports = {
-  i18n: {
-    defaultLocale: 'en',
-    locales: ['en', 'fr'],
+#### Markdown files {#markdown-files}
+
+This is the main content of your Docusaurus website.
+
+Markdown and MDX documents are translated as a whole, to fully preserve the translation context, instead of splitting each sentence as a separate string.
+
+#### JSON files {#json-files}
+
+JSON is used to translate:
+
+- Your React code: standalone React pages in `src/pages`, or other components
+- Layout labels provided through `themeConfig`: navbar, footer
+- Layout labels provided through plugin options: docs sidebar category labels, blog sidebar title...
+
+The JSON format used is called **Chrome i18n**:
+
+```json
+{
+  "myTranslationKey1": {
+    "message": "Translated message 1",
+    "description": "myTranslationKey1 is used on the homepage"
   },
-  themeConfig: {
-    navbar: {
-      items: [
-        // ...
-        {
-          type: 'localeDropdown',
-          position: 'left',
-        },
-        // ...
-      ],
-    },
-  },
-  // ...
-};
-```
-
-Translate the homepage:
-
-```jsx title="src/pages/index.js"
-import React from 'react';
-import Translate from '@docusaurus/Translate';
-import Layout from '@theme/Layout';
-
-export default function Home() {
-  return (
-    <Layout>
-      <h1 style={{margin: 20}}>
-        <Translate description="The homepage main heading">
-          Welcome to my Docusaurus translated site!
-        </Translate>
-      </h1>
-    </Layout>
-  );
+  "myTranslationKey2": {
+    "message": "Translated message 2",
+    "description": "myTranslationKey2 is used on the FAQ page"
+  }
 }
 ```
 
-### Initialize the `i18n` folder {#initialize-the-i18n-folder}
+The choice was made for 2 reasons:
 
-Use the [write-translations](../cli.md#docusaurus-write-translations-sitedir) CLI command to initialize the JSON translation files for the French locale:
+- **Description attribute**: to help translators with additional context
+- **Widely supported**: [Chrome extensions](https://developer.chrome.com/docs/extensions/mv2/i18n-messages/), [Crowdin](https://support.crowdin.com/file-formats/chrome-json/), [Transifex](https://docs.transifex.com/formats/chrome-json), [Phrase](https://help.phrase.com/help/chrome-json-messages), [Applanga](https://www.applanga.com/docs/formats/chrome_i18n_json), etc.
 
-```bash npm2yarn
-npm run write-translations -- --locale fr
+#### Data files {#data-files}
 
-  1 translations written at i18n/fr/code.json
- 11 translations written at i18n/fr/docusaurus-theme-classic/footer.json
-  4 translations written at i18n/fr/docusaurus-theme-classic/navbar.json
-  3 translations written at i18n/fr/docusaurus-plugin-content-docs/current.json
+Some plugins may read from external data files that are localized as a whole. For example, the blog plugin uses an [`authors.yml`](../blog.mdx#global-authors) file that can be translated by creating a copy under `i18n/[locale]/docusaurus-plugin-content-blog/authors.yml`.
+
+### Translation files location {#translation-files-location}
+
+The translation files should be created at the correct filesystem location.
+
+Each locale and plugin has its own `i18n` subfolder:
+
+```
+website/i18n/[locale]/[pluginName]/...
 ```
 
-:::tip
+:::note
 
-Use the `--messagePrefix '(fr) '` option to make the untranslated strings stand out.
-
-`Hello` will appear as `(fr) Hello` and makes it clear a translation is missing.
+For multi-instance plugins, the path is `website/i18n/[locale]/[pluginName]-[pluginId]/...`.
 
 :::
 
-Copy your untranslated Markdown files to the French folder:
+Translating a very simple Docusaurus site in French would lead to the following tree:
 
 ```bash
-mkdir -p i18n/fr/docusaurus-plugin-content-docs/current
-cp -r docs/** i18n/fr/docusaurus-plugin-content-docs/current
-
-mkdir -p i18n/fr/docusaurus-plugin-content-blog
-cp -r blog/** i18n/fr/docusaurus-plugin-content-blog
-
-mkdir -p i18n/fr/docusaurus-plugin-content-pages
-cp -r src/pages/**.md i18n/fr/docusaurus-plugin-content-pages
-cp -r src/pages/**.mdx i18n/fr/docusaurus-plugin-content-pages
+website/i18n
+└── fr
+    ├── code.json  # Any text label present in the React code
+    │              # Includes text labels from the themes' code
+    ├── docusaurus-plugin-content-blog # translation data the blog plugin needs
+    │   └── 2020-01-01-hello.md
+    │
+    ├── docusaurus-plugin-content-docs # translation data the docs plugin needs
+    │   ├── current
+    │   │   ├── doc1.md
+    │   │   └── doc2.mdx
+    │   └── current.json
+    │
+    └── docusaurus-theme-classic # translation data the classic theme needs
+        ├── footer.json   # Text labels in your footer theme config
+        └── navbar.json   # Text labels in your navbar theme config
 ```
 
-Add all these files to Git.
+The JSON files are initialized with the [`docusaurus write-translations`](../cli.md#docusaurus-write-translations-sitedir) CLI command. Each plugin sources its own translated content under the corresponding folder, while the `code.json` file defines all text labels used in the React code.
 
-### Translate the files {#translate-the-files}
+Each content plugin or theme is different, and **defines its own translation files location**:
 
-Translate the Markdown and JSON files in `i18n/fr` and commit the translation.
-
-You should now be able to start your site in French and see the translations:
-
-```bash npm2yarn
-npm run start -- --locale fr
-```
-
-You can also build the site locally or on your CI:
-
-```bash npm2yarn
-npm run build
-# or
-npm run build -- --locale fr
-```
-
-### Repeat {#repeat}
-
-Follow the same process for each locale you need to support.
-
-## Maintenance {#maintenance}
-
-Keeping translated files **consistent** with the originals **can be challenging**, in particular for Markdown documents.
-
-### Markdown translations {#markdown-translations}
-
-When an untranslated Markdown document is edited, it is **your responsibility to maintain the respective translated files**, and we unfortunately don't have a good way to help you do so.
-
-To keep your translated sites consistent, when the `website/docs/doc1.md` doc is edited, you need **backport these edits** to `i18n/fr/docusaurus-plugin-content-docs/current/doc1.md`.
-
-### JSON translations {#json-translations}
-
-To help you maintain the JSON translation files, it is possible to run again the [write-translations](../cli.md#docusaurus-write-translations-sitedir) CLI command:
-
-```bash npm2yarn
-npm run write-translations -- --locale fr
-```
-
-New translations will be appended, and existing ones will not be overridden.
-
-:::tip
-
-Reset your translations with the `--override` option.
-
-:::
-
-### Localize edit URLs {#localize-edit-urls}
-
-When the user is browsing a page at `/fr/doc1`, the edit button will link by default to the unlocalized doc at `website/docs/doc1.md`.
-
-Your translations are on Git, and you can use the `editLocalizedFiles: true` option of the docs and blog plugins.
-
-The edit button will link to the localized doc at `i18n/fr/docusaurus-plugin-content-docs/current/doc1.md`.
+- [Docs i18n](../api/plugins/plugin-content-docs.md#i18n)
+- [Blog i18n](../api/plugins/plugin-content-blog.md#i18n)
+- [Pages i18n](../api/plugins/plugin-content-pages.md#i18n)
+- [Themes i18n](../api/themes/theme-configuration.md#i18n)

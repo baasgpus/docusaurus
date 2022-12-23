@@ -5,66 +5,53 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-import React, {useState, useEffect, useCallback} from 'react';
-import clsx from 'clsx';
-import {useHistory, useLocation} from '@docusaurus/router';
-
-import {prepareUserState} from '../../index';
-
-import styles from './styles.module.css';
-
-export type Operator = 'OR' | 'AND';
-
-export const OperatorQueryKey = 'operator';
-
-export function readOperator(search: string): Operator {
-  return (new URLSearchParams(search).get(OperatorQueryKey) ??
-    'OR') as Operator;
+.checkboxLabel {
+  --height: 25px;
+  --width: 80px;
+  --border: 2px;
+  display: flex;
+  width: var(--width);
+  height: var(--height);
+  position: relative;
+  border-radius: var(--height);
+  border: var(--border) solid var(--ifm-color-primary-darkest);
+  cursor: pointer;
+  justify-content: space-around;
+  opacity: 0.75;
+  transition: opacity var(--ifm-transition-fast)
+    var(--ifm-transition-timing-default);
+  box-shadow: var(--ifm-global-shadow-md);
 }
 
-export default function ShowcaseFilterToggle(): JSX.Element {
-  const id = 'showcase_filter_toggle';
-  const location = useLocation();
-  const history = useHistory();
-  const [operator, setOperator] = useState(false);
-  useEffect(() => {
-    setOperator(readOperator(location.search) === 'AND');
-  }, [location]);
-  const toggleOperator = useCallback(() => {
-    setOperator((o) => !o);
-    const searchParams = new URLSearchParams(location.search);
-    searchParams.delete(OperatorQueryKey);
-    if (!operator) {
-      searchParams.append(OperatorQueryKey, 'AND');
-    }
-    history.push({
-      ...location,
-      search: searchParams.toString(),
-      state: prepareUserState(),
-    });
-  }, [operator, location, history]);
+.checkboxLabel:hover {
+  opacity: 1;
+  box-shadow: var(--ifm-global-shadow-md),
+    0 0 2px 1px var(--ifm-color-primary-dark);
+}
 
-  return (
-    <div>
-      <input
-        type="checkbox"
-        id={id}
-        className="screen-reader-only"
-        aria-label="Toggle between or and and for the tags you selected"
-        onChange={toggleOperator}
-        onKeyDown={(e) => {
-          if (e.key === 'Enter') {
-            toggleOperator();
-          }
-        }}
-        checked={operator}
-      />
-      <label htmlFor={id} className={clsx(styles.checkboxLabel, 'shadow--md')}>
-        {/* eslint-disable @docusaurus/no-untranslated-text */}
-        <span className={styles.checkboxLabelOr}>OR</span>
-        <span className={styles.checkboxLabelAnd}>AND</span>
-        {/* eslint-enable @docusaurus/no-untranslated-text */}
-      </label>
-    </div>
-  );
+.checkboxLabel::after {
+  position: absolute;
+  content: '';
+  inset: 0;
+  width: calc(var(--width) / 2);
+  height: 100%;
+  border-radius: var(--height);
+  background-color: var(--ifm-color-primary-darkest);
+  transition: transform var(--ifm-transition-fast)
+    var(--ifm-transition-timing-default);
+  transform: translateX(calc(var(--width) / 2 - var(--border)));
+}
+
+input:focus-visible ~ .checkboxLabel::after {
+  outline: 2px solid currentColor;
+}
+
+.checkboxLabel > * {
+  font-size: 0.8rem;
+  color: inherit;
+  transition: opacity 150ms ease-in 50ms;
+}
+
+input:checked ~ .checkboxLabel::after {
+  transform: translateX(calc(-1 * var(--border)));
 }

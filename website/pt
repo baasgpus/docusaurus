@@ -1,105 +1,167 @@
 ---
-slug: /migration
+slug: /migration/translated-sites
 ---
 
-# Migration overview
+# Translated sites
 
-This doc guides you through migrating an existing Docusaurus 1 site to Docusaurus 2.
+This page explains how migrate a translated Docusaurus v1 site to Docusaurus v2.
 
-We try to make this as easy as possible, and provide a migration CLI.
+## i18n differences {#i18n-differences}
 
-## Main differences {#main-differences}
+Docusaurus v2 i18n is conceptually quite similar to Docusaurus v1 i18n with a few differences.
 
-Docusaurus 1 is a pure documentation site generator, using React as a server-side template engine, but not loading React on the browser.
+It is not tightly coupled to Crowdin, and you can use Git or another SaaS instead.
 
-Docusaurus 2, rebuilt from the ground up, generates a single-page-application, using the full power of React in the browser. It allows for more customizability but preserved the best parts of Docusaurus 1 - easy to get started, versioned docs, and i18n.
+### Different filesystem paths {#different-filesystem-paths}
 
-Beyond that, Docusaurus 2 is a **performant static site generator** and can be used to create common content-driven websites (e.g. Documentation, Blogs, Product Landing and Marketing Pages, etc) extremely quickly.
+On Docusaurus v2, localized content is generally found at `website/i18n/[locale]`.
 
-While our main focus will still be helping you get your documentations right and well, it is possible to build any kind of website using Docusaurus 2 as it is just a React application. **Docusaurus can now be used to build any website, not just documentation websites.**
+Docusaurus v2 is modular based on a plugin system, and each plugin is responsible to manage its own translations.
 
-## Docusaurus 1 structure {#docusaurus-1-structure}
+Each plugin has its own i18n subfolder, like: `website/i18n/fr/docusaurus-plugin-content-blog`
 
-Your Docusaurus 1 site should have the following structure:
+### Updated translation APIs {#updated-translation-apis}
 
-```bash
-├── docs
-└── website
-    ├── blog
-    ├── core
-    │   └── Footer.js
-    ├── package.json
-    ├── pages
-    ├── sidebars.json
-    ├── siteConfig.js
-    └── static
+With Docusaurus v1, you translate your pages with `<translate>`:
+
+```jsx
+const translate = require('../../server/translate.js').translate;
+
+<h2>
+  <translate desc="the header description">
+    This header will be translated
+  </translate>
+</h2>;
 ```
 
-## Docusaurus 2 structure {#docusaurus-2-structure}
+On Docusaurus v2, you translate your pages with `<Translate>`
 
-After the migration, your Docusaurus 2 site could look like:
+```jsx
+import Translate from '@docusaurus/Translate';
 
-```sh
-├── docs
-└── website
-    ├── blog
-    ├── src
-    │   ├── components
-    │   ├── css
-    │   └── pages
-    ├── static
-    ├── package.json
-    ├── sidebars.json
-    ├── docusaurus.config.js
+<h2>
+  <Translate id="header.translation.id" description="the header description">
+    This header will be translated
+  </Translate>
+</h2>;
 ```
-
-:::info
-
-This migration does not change the `/docs` folder location, but Docusaurus v2 sites generally have the `/docs` folder inside `/website`
-
-You are free to put the `/docs` folder anywhere you want after having migrated to v2.
-
-:::
-
-## Migration process {#migration-process}
-
-There are multiple things to migrate to obtain a fully functional Docusaurus 2 website:
-
-- packages
-- CLI commands
-- site configuration
-- Markdown files
-- sidebars file
-- pages, components and CSS
-- versioned docs
-- i18n support 🚧
-
-## Automated migration process {#automated-migration-process}
-
-The [migration CLI](./migration-automated.md) will handle many things of the migration for you.
-
-However, some parts can't easily be automated, and you will have to fallback to the manual process.
 
 :::note
 
-We recommend running the migration CLI, and complete the missing parts thanks to the manual migration process.
+The `write-translations` CLI still works to extract translations from your code.
+
+The code translations are now added to `i18n/[locale]/code.json` using Chrome i18n JSON format.
 
 :::
 
-## Manual migration process {#manual-migration-process}
+### Stricter Markdown parser {#stricter-markdown-parser}
 
-Some parts of the migration can't be automated (particularly the pages), and you will have to migrate them manually.
+Docusaurus v2 is using [MDX](https://mdxjs.com/) to parse Markdown files.
 
-The [manual migration guide](./migration-manual.md) will give you all the manual steps.
+MDX compiles Markdown files to React components, is stricter than the Docusaurus v1 parser, and will make your build fail on error instead of rendering some bad content.
 
-## Support {#support}
+Also, the HTML elements must be replaced by JSX elements.
 
-For any questions, you can ask in the [`#migration-v1-to-v2` Discord channel](https://discord.gg/C3P6CxMMxY).
+This is particularly important for i18n because if your translations are not good on Crowdin and use invalid Markup, your v2 translated site might fail to build: you may need to do some translation cleanup to fix the errors.
 
-Feel free to tag [@slorber](https://github.com/slorber) in any migration PRs if you would like us to have a look.
+## Migration strategies {#migration-strategies}
 
-We also have volunteers willing to [help you migrate your v1 site](https://github.com/facebook/docusaurus/issues/1834).
+This section will help you figure out how to **keep your existing v1 translations after you migrate to v2**.
 
-## Example migration PRs {#example-migration-prs}
+There are **multiple possible strategies** to migrate a Docusaurus v1 site using Crowdin, with different tradeoffs.
 
-You might want to refer to our migration PRs for [Create React App](https://github.com/facebook/create-react-app/pull/7785) and [Flux](https://github.com/facebook/flux/pull/471) as examples of how a migration for a basic Docusaurus v1 site can be done.
+:::caution
+
+This documentation is a best-effort to help you migrate, please help us improve it if you find a better way!
+
+:::
+
+Before all, we recommend to:
+
+- Migrate your v1 Docusaurus site to v2 without the translations
+- Get familiar with the [new i18n system of Docusaurus v2](../i18n/i18n-introduction.md) an
+- Make Crowdin work for your v2 site, using a new and untranslated Crowdin project and the [Crowdin tutorial](../i18n/i18n-crowdin.mdx)
+
+:::danger
+
+Don't try to migrate without understanding both Crowdin and Docusaurus v2 i18n.
+
+:::
+
+### Create a new Crowdin project {#create-a-new-crowdin-project}
+
+To avoid any **risk of breaking your v1 site in production**, one possible strategy is to duplicate the original v1 Crowdin project.
+
+:::info
+
+This strategy was used to [upgrade the Jest website](https://jestjs.io/blog/2021/03/09/jest-website-upgrade).
+
+:::
+
+Unfortunately, Crowdin does not have any "Duplicate/clone Project" feature, which makes things complicated.
+
+- Download the translation memory of your original project in `.tmx` format (`https://crowdin.com/project/<ORIGINAL_PROJECT>/settings#tm` > `View Records`)
+- Upload the translation memory to your new project (`https://crowdin.com/project/<NEW_PROJECT>/settings#tm` > `View Records`)
+- Reconfigure `crowdin.yml` for Docusaurus v2 according to the i18n docs
+- Upload the Docusaurus v2 source files with the Crowdin CLI to the new project
+- Mark sensitive strings like `id` or `slug` as "hidden string" on Crowdin
+- On the "Translations" tab, click on "Pre-Translation > via TM" (`https://crowdin.com/project/<NEW_PROJECT>/settings#translations`)
+- Try first with "100% match" (more content will be translated than "Perfect"), and pre-translate your sources
+- Download the Crowdin translations locally
+- Try to run/build your site and see if there are any errors
+
+You will likely have errors on your first-try: the pre-translation might try to translate things that it should not be translated (front matter, admonition, code blocks...), and the translated MD files might be invalid for the MDX parser.
+
+You will have to fix all the errors until your site builds. You can do that by modifying the translated MD files locally, and fix your site for one locale at a time using `docusaurus build --locale fr`.
+
+There is no ultimate guide we could write to fix these errors, but common errors are due to:
+
+- Not marking enough strings as "hidden strings" in Crowdin, leading to pre-translation trying to translate these strings.
+- Having bad v1 translations, leading to invalid markup in v2: bad HTML elements inside translations and unclosed tags
+- Anything rejected by the MDX parser, like using HTML elements instead of JSX elements (use the [MDX playground](https://mdxjs.com/playground/) for debugging)
+
+You might want to repeat this pre-translation process, eventually trying the "Perfect" option and limiting pre-translation only some languages/files.
+
+:::tip
+
+Use [`mdx-code-block`](../i18n/i18n-crowdin.mdx#mdx-solutions) around problematic Markdown elements: Crowdin is less likely mess things up with code blocks.
+
+:::
+
+:::note
+
+You will likely notice that some things were translated on your old project, but are now untranslated in your new project.
+
+The Crowdin Markdown parser is evolving other time and each Crowdin project has a different parser version, which can lead to pre-translation not being able to pre-translate all the strings.
+
+This parser version is undocumented, and you will have to ask the Crowdin support to know your project's parser version and fix one specific version.
+
+Using the same CLI version and parser version across the 2 Crowdin projects might give better results.
+
+:::
+
+:::danger
+
+Crowdin has an "upload translations" feature, but in our experience it does not give very good results for Markdown
+
+:::
+
+### Use the existing Crowdin project {#use-the-existing-crowdin-project}
+
+If you don't mind modifying your existing Crowdin project and risking to mess things up, it may be possible to use the Crowdin branch system.
+
+:::caution
+
+This workflow has not been tested in practice, please report us how good it is.
+
+:::
+
+This way, you wouldn't need to create a new Crowdin project, transfer the translation memory, apply pre-translations, and try to fix the pre-translations errors.
+
+You could create a Crowdin branch for Docusaurus v2, where you upload the v2 sources, and merge the Crowdin branch to main once ready.
+
+### Use Git instead of Crowdin {#use-git-instead-of-crowdin}
+
+It is possible to migrate away of Crowdin, and add the translation files to Git instead.
+
+Use the Crowdin CLI to download the v1 translated files, and put these translated files at the correct Docusaurus v2 filesystem location.

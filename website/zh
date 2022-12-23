@@ -1,159 +1,127 @@
 ---
-title: Introducing Docusaurus
-authors: JMarcey
+title: How I Converted Profilo to Docusaurus in Under 2 Hours
+author: Christine Abernathy
+authorURL: http://twitter.com/abernathyca
+authorImageURL: https://github.com/caabernathy.png
+authorTwitter: abernathyca
 tags:
-  - documentation
-  - blog
-  - docusaurus
+  - profilo
+  - adoption
 ---
 
-![](/img/slash-introducing.svg)
+> _“Joel and I were discussing having a website and how it would have been great to launch with it. So I challenged myself to add Docusaurus support. It took just over an hour and a half. I'm going to send you a PR with the addition so you can take a look and see if you like it. Your workflow for adding docs wouldn't be much different from editing those Markdown files.”_
+> 
+> _— Note sent to the Profilo team_
 
-We are very happy to introduce [Docusaurus](https://github.com/facebook/docusaurus) to help you manage one or many open source websites.
+This is the story of the rather short journey it took to create the [Profilo](https://facebookincubator.github.io/profilo/) website using Docusaurus.
 
-We created [Docusaurus](https://docusaurus.io) for the following reasons:
-
-1. To put the focus on writing good documentation instead of worrying about the infrastructure of a website.
-1. To provide features that many of our open source websites need like blog support, search and versioning.
-1. To make it easy to push updates, new features, and bug fixes to everyone all at once.
-1. And, finally, to provide a consistent look and feel across all of our open source projects.
+Profilo, an Android library for collecting performance traces from production, [was announced](https://code.fb.com/android/profilo-understanding-app-performance-in-the-wild/) earlier this year. The project was [published on GitHub](https://github.com/facebookincubator/profilo/tree/802042f90f990998a272387e371b893af52465b8) with a less than [a handful or Markdown files](https://github.com/facebookincubator/profilo/tree/802042f90f990998a272387e371b893af52465b8/docs) to describe its functionality and no website to showcase any branding and highlight the logo. The task at hand was to turn these existing docs and logo into a website.
 
 <!--truncate-->
 
-Docusaurus is a tool designed to make it easy for teams to publish documentation websites without having to worry about the infrastructure and design details. At its core, all a user has to provide are documentation files written in Markdown, customization of a provided home page written in React, and a few configuration modifications. Docusaurus handles the rest by providing default styles, site formatting, and simple document navigation. Getting started is easy, as users can [install](https://v1.docusaurus.io/docs/en/installation.html) it using `npm` or `yarn` via a simple initialization script that [creates a working example website out of the box](https://v1.docusaurus.io/docs/en/site-preparation.html).
+In general, when creating a website with Docusaurus you do the following:
 
-Docusaurus also provides core website and documentation features out-of-the-box including [blog support](https://v1.docusaurus.io/docs/en/blog.html), [internationalization](https://v1.docusaurus.io/docs/en/translation.html), [search](https://v1.docusaurus.io/docs/en/search.html), and [versioning](https://v1.docusaurus.io/docs/en/versioning.html). While some projects may not require any of these features, enabling them is generally a matter of updating configuration options instead of having to add the infrastructure from the ground up. As more features get added to Docusaurus, users just can easily update to the latest version. This can be done by simply running npm or yarn update and updating configuration options. Users or teams will no longer need to manually rework their entire website infrastructure each time a new feature gets added.
+1. Generate a template website using Docusaurus scripts.
+1. Customize the generated template files for your desired site colors and your project configuration (ex: website and GitHub links).
+1. Create the website content:
+   1. Add your docs and any supporting assets.
+   1. Customize the default landing page provided by Docusaurus to suit your needs.
+   1. Configure the default site navigation file.
+1. Publish the website and set up how it will be published for future changes.
 
-## The Birth of docusaurus
+Given I had pre-existing Markdown files, I didn't have to generate the core content but simply make sure that Docusaurus could process the files by adding the expected metadata to them. Most of the work would therefore consist of customizing the defaults provided by Docusaurus.
 
-![](/img/slash-birth.png)
+## Overview of Steps Taken
 
-When Facebook first started their open source program, many teams implemented a custom website for each of their open source projects. This approach presented challenges when the open source program team was asked to help the project teams improve their documentation. Since each site was unique, adding basic infrastructure such as a blog, consistent navigation, search, etc. became challenging undertakings.
+Here's an overview of the steps taken to convert to a website. I'll discuss some of the design aspects in a later section.
 
-The open source team tried to help mitigate this problem by coming up with a standard template, based on Jekyll, that could be used as a starting point for a project website. We asked our new projects to manually copy our template source to their repo, write their docs, and publish. This template approach was adopted by most of open source projects launched; some existing projects even converted their custom website implementations to the new template as well.
+**Design and colors:**
 
-The problem with the "copy the template to your repo" approach is that, even though the platform is consistent, pushing updates becomes unmaintainable across an entire suite of projects already using the template. This is because we lost control of the template after a project copied it to their repo. Projects were free to modify the template as desired and apply their own project-specific features to it. So while projects share the same site generation platform, they have now diverted enough where they cannot take advantage of the new features we have added to the template over time. There was no easy way we could ask all current projects to "copy" a new version of the template since it might break their existing site or remove features that they have added on their own. Instead, we would have to apply the updates manually to each project one-by-one. This became very problematic when projects started asking for our team for internationalization support within the template, requiring low-level changes to how the template was structured and generated.
+1. Got all the desired logo formats from designer. I had to create the _.favicon_ one.
+1. Worked out some passable primary and secondary website colors using the http://paletton.com/ tools - very handy!
 
-So we started thinking about what we could do to help mitigate the challenge of keeping sites updated and consistent across our entire portfolio. We also wanted multiple projects to share the same site generation software. We wanted them to start out with the same template, and yet have the flexibility to customize and adapt their site theme to suit their needs. They should be able to extend and customize their site, but when we update the underlying infrastructure with fixes and features, the project should be able update simply and without any breaking changes.
+**Initial website setup:**
 
-Docusaurus was born!
+1. Forked the [Profilo project](https://github.com/facebookincubator/profilo/) on GitHub and created a local clone of the fork to set up the website.
+1. Created the initial Docusaurus website using the [installation instructions](https://v1.docusaurus.io/docs/en/installation.html).
+1. Deleted the `docs-examples-from-docusaurus` and `website/blog-examples-from-docusaurus` folders as these would not be needed. Profilo had existing docs we could use and there was no need for blogs at this time.
 
-At Facebook, Docusaurus allows us to quickly get different projects up and running with documentation websites, especially for teams who don't have much experience with web development or primarily want a basic site to showcase their project. Docusaurus already supports sites needing more advanced features like internationalization for Jest and versioning for React Native. As different projects request new features for their sites, they are added to Docusaurus and simultaneously provided to all projects! All together, this ends up greatly reducing the work needed to maintain different sites for different projects. Our teams are able to focus on keeping their projects healthier by spending more time adding features, fixing bugs, and writing documentation.
+**Content creation:**
 
-## Getting Up and Running
+1. Added metadata to the existing Markdown files found in the `docs` folder, for example:
 
-![](/img/slash-up-and-running.png)
+   ```md
+   ---
+   id: architecture
+   title: Architecture
+   sidebar_label: Architecture
+   ---
+   ```
 
-At its core, we wanted sites running Docusaurus to be simple to use. With one [installation](https://v1.docusaurus.io/docs/en/installation.html) command and some simple [configuration](https://v1.docusaurus.io/docs/en/site-preparation.html), you can actually have a default running website.
+2. Added the logo assets to the `website/static/img` folder.
+3. Modified `website/pages/en/index.js`, the landing page, to highlight Profilo features.
+4. Modified `website/core/Footer.js`, the footer, to simplify it for Profilo.
+5. Edited `website/siteConfig.js` (website configuration file) to specify the previously chosen primary and secondary colors.
+6. Modified `website/sidebars.json` that specifies the sidebar navigation. Listed all the docs and customized it based on the metadata added to the Markdown files.
+7. Edited the website configuration file to specify the GitHub properties, logo images, header links, and the website link.
+8. Tested the website locally throughout this phase. (I ran `yarn start` from the `website` folder to start the server.)
 
-When you run `docusaurus-init`, you will see a structure similar to:
+**Feedback and review changes:**
 
-```bash
-root-of-repo
-├── docs-examples-from-docusaurus
-│   ├── doc1.md
-│   ├── doc2.md
-│   ├── doc3.md
-│   ├── example-doc4.md
-│   └── example-doc5.md
-├── website
-│   ├── blog-examples-from-docusaurus
-│   │   ├── 2016-03-11-blog-post.md
-│   │   └── 2017-04-10-blog-post-two.md
-│   ├── core
-│   │   └── Footer.js
-│   ├── node_modules
-│   ├── package.json
-│   ├── pages
-│   ├── sidebars.json
-│   ├── siteConfig.js
-│   └── static
-```
+1. Sent a [pull request](https://github.com/facebookincubator/profilo/pull/6) to the project.
+2. Updated the colors after the designer rightly gasped at the ones I had chosen (IANAD).
+3. Updated the colors and updated the PR.
+4. The PR was then accepted and [merged](https://github.com/facebookincubator/profilo/commit/6ad033aaf5a7d54e6d842f45a5bccd051a8e45ad). Yay!
 
-With the exception of node_modules and package.json, all the directories and files you see are where you customize and add content to your Docusaurus-based website. The docs folder is where you add your Markdown that represents your documentation; the blog folder is where you add your Markdown for your [blog posts](https://v1.docusaurus.io/docs/en/blog.html); `siteConfig.js` is where you make most of the [customizations](https://v1.docusaurus.io/docs/en/site-config.html) for your site; `sidebars.json` is where you maintain the layout and content of the [sidebar](https://v1.docusaurus.io/docs/en/navigation.html) for your documentation; the `pages` folder is where you add [custom](https://v1.docusaurus.io/docs/en/custom-pages.html) pages for your site; the `static` folder is where all of your static assets go (e.g., CSS stylesheets and images); and the `core` folder is where you can customize core components of the site, in this case the footer.
+**Website publishing:**
 
-## How does Docusaurus work?
+1. Pushed the first website version by running the Docusaurus publish script from the command line:
 
-Docusaurus is written primarily in JavaScript and [React](https://facebook.github.io/react), replacing Jekyll which we used in the old template. We use [Remarkable](https://github.com/jonschlinkert/remarkable) for our Markdown rendering and [highlight.js](https://highlightjs.org/) for our code block syntax highlighting. The core of Docusaurus' functionality is in the [lib directory](https://github.com/facebookexperimental/Docusaurus/tree/master/lib) of the [Docusaurus repo](https://github.com/facebook/docusaurus/). The general structure looks like:
+   ```bash
+   USE_SSH=true \
+     GIT_USER=caabernathy \
+     CURRENT_BRANCH=master \
+     yarn run publish-gh-pages
+   ```
 
-```bash
-root-of-Docusaurus
-├── lib
-│   ├── core
-│   ├── server
-│   │   ├── generate.js
-│   │   ├── server.js
-│   │   └── ...and more files
-│   ├── static
-│   ├── build-files.js
-│   ├── copy-examples.js
-│   ├── generate-feed.js
-│   ├── publish-gh-pages.js
-│   ├── rename-version.js
-│   ├── start-server.js
-│   ├── versions.js
-│   └── write-translations.js
-```
+2. Configured CircleCI using the [provided Docusaurus instructions](https://v1.docusaurus.io/docs/en/publishing.html#automating-deployments-using-continuous-integration). There were 2 PRs for this, [the first](https://github.com/facebookincubator/profilo/pull/8)for the initial config and [the second](https://github.com/facebookincubator/profilo/pull/12) to make sure CircleCI only triggered for changes in the master branch (thanks Joel Marcey!).
 
-The key files here are build-files.js and start-server.js. There are many similarities between these two files: `build-files.js` is used to build the physical artifacts for serving by an external web server. `start-server.js` is used to run the Docusaurus server and locally test your site. Both go through the following general process to take all of the Markdown and configuration to create a runnable website:
+The final website was published on https://facebookincubator.github.io/profilo/. It had taken 1.5 hours to get to the initial PR stage and another half an hour or so to respond to review feedback and publish the website.
 
-1. Process your website settings in `siteConfig.js`
-1. Read the document metadata that exists in all the Markdown files in your docs directory.
-1. Create a table of contents for your documents based upon the IDs extracted from the metadata.
-1. Convert the Markdown to HTML, including doing link replacement.
-1. These files will go in a build/docs directory of the compiled site, and any translated versions will go into a language specific folder within the build/docs folder.
-1. Repeat 1-3 for blog posts.
-1. The blog file will go in a build/blog directory of the compiled site.
-1. Read the main.css file and concatenate any user-defined css into master css file that will be in the build/css directory of the compiled site.
-1. Copy images into an build/img directory of the compiled site.
-1. Take any custom pages that were added to the pages folder of the site and compile/copy those into the root build directory of the compiled site. Any translated versions will go into a language specific folder within build.
-1. Create CNAME and sitemap.xml files and add those to build.
+## Design
 
-Note that this process does not take into full account how translations or versioning works. The underlying details of those features will be saved for future blog posts.
+Here's what the initial website looked like when the first pull request was sent out:
 
-The final structure of your compiled site will look similar to:
+![The website's front page, with a quite bright and saturated red color as the primary color, closely resembling the Profilo logo color, making the logo unrecognizable in the navbar](/img/profilo_blog_post_website_initial.png)
 
-```bash
-build
-├── website
-│   ├── CNAME
-│   ├── blog
-│   ├── css
-│   ├── docs
-│   ├── en
-│   ├── help.html # custom page
-│   ├── img
-│   ├── index.html # landing page
-│   ├── sitemap.xml
-│   └── users.html # custom page
-```
+Most of the time in the content creation was spent picking colors that worked reasonably well with the given logo. These colors were a good jumping off point for designer feedback. I used Photoshop to sample various portions of the logo.
 
-## Community
+![Picking colors in Photoshop, with the Profilo logo and the main working area in the background and a color picker dialog in the foreground, selected to a red shade](/img/profilo_blog_post_photoshop_color_picker.png)
 
-![](/img/docusaurus.svg)
+I then took the RGB representation of the color and set it as the baseline color on [Paletton](http://paletton.com/). The website then gave me various color options to try on the website by editing the Docusaurus website configuration file.
 
-We welcome your [contributions](https://github.com/facebook/docusaurus/blob/master/CONTRIBUTING.md) to Docusaurus, whether you want to use it for your own site, you want to [contribute](https://github.com/facebook/docusaurus/blob/master/CONTRIBUTING.md) to the Docusaurus core or just have questions. Follow us on [GitHub](https://github.com/facebook/docusaurus) and [Twitter](https://twitter.com/docusaurus).
+![Using Paletton to generate a full palette from the red shade selected. There's a color wheel showing all hues on the left, and a square showing various shades of red on the right.](/img/profilo_blog_post_palette_website_color_picker.png)
 
-## Acknowledgements
+The selected primary and secondary colors were a good jumping off point for designer feedback.
 
-Docusaurus wouldn't exist without the work of the rest of the core Docusaurus team: [Eric Nakagawa](http://twitter.com/ericnakagawa), [Hector Ramos](https://twitter.com/hectorramos), [Eric Vicenti](https://twitter.com/EricVicenti) and [Frank Li](https://github.com/deltice) — a former intern at Facebook who implemented the core technology and features.
+There were also modifications made to the default website generated by Docusaurus. These changes were mainly around simplifying the footer and creating a customized landing page for Profilo that listed the project's features.
 
-Special thanks also goes out to our earliest [adopters](https://v1.docusaurus.io/en/users.html) of Docusaurus:
+Here's what the final website looked like:
 
-- [BuckleScript](https://bucklescript.github.io/)
-- [FastText](https://fasttext.cc)
-- [Jest](https://jestjs.io)
-- [Make It Open](http://makeitopen.com)
-- [Prettier](https://prettier.io/)
-- [Reason-react](https://reasonml.github.io/reason-react/)
-- [React Native](https://facebook.github.io/react-native/)
-- [Relay](https://facebook.github.io/relay/)
+![The website's front page, with a much darker red color as the primary color, making both the logo and the primary-colored title text clearly legible.](/img/profilo_blog_post_website_final.png)
 
-Without their dedication to creating or migrating their websites over to the platform, we would have not have been in the position where we are today.
+This is an example page showing the core content, in this case the Getting Started page:
 
-## Resources
+![A doc page with the sidebar on the left quarter of the screen and the main content occupying the rest. Some text is using the primary color and the main body uses multiple kinds of typesetting including bold, list, and code](/img/profilo_blog_post_website_final_docs.png)
 
-- [Read our documentation](https://v1.docusaurus.io)
-- [Follow our Twitter feed](https://twitter.com/docusaurus)
-- [Follow us on GitHub](https://github.com/facebook/docusaurus)
-- [About Slash, the Docusaurus mascot](https://v1.docusaurus.io/about-slash.html)
+This also shows the sidebar structure that was set up through editing `website/sidebars.json`.
+
+Lastly, I didn't have to worry about handling responsive design. You get this out of the box with Docusaurus!
+
+![Mobile screenshots of the front page and sample doc page. The layout is automatically adjusted to make it appear more natural. The doc sidebar is hidden behind a button.](/img/profilo_blog_post_android_ios.png)
+
+## Final Thoughts
+
+The Profilo engineers were happy to see that they didn't have to change their workflow to update existing content. They were able to continue working with Markdown files. This will still be true in the future if new docs are added, although there may be some config changes needed if the sidebar navigation needs to be updated.
+
+The infrastructure provided by Docusaurus made it easy to convert Markdown files into a working website. Even though the project had only three docs, this gave Profilo a more professional look. So, it was well worth the short time investment to get it done.

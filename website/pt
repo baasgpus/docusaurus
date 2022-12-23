@@ -1,29 +1,20 @@
 ---
-sidebar_position: 3
-slug: /api/themes/@docusaurus/theme-live-codeblock
+sidebar_position: 4
+slug: /api/themes/@docusaurus/theme-search-algolia
 ---
 
-# 📦 theme-live-codeblock
+# 📦 theme-search-algolia
 
-This theme provides a `@theme/CodeBlock` component that is powered by react-live. You can read more on [interactive code editor](../../guides/markdown-features/markdown-features-code-blocks.mdx#interactive-code-editor) documentation.
+This theme provides a `@theme/SearchBar` component that integrates with Algolia DocSearch easily. Combined with `@docusaurus/theme-classic`, it provides a very easy search integration. You can read more on [search](../../search.md) documentation.
 
 ```bash npm2yarn
-npm install --save @docusaurus/theme-live-codeblock
+npm install --save @docusaurus/theme-search-algolia
 ```
 
-### Configuration {#configuration}
+This theme also adds search page available at `/search` (as swizzlable `SearchPage` component) path with OpenSearch support. You can change this default path via `themeConfig.algolia.searchPagePath`. Use `false` to disable search page.
 
-```js title="docusaurus.config.js"
-module.exports = {
-  plugins: ['@docusaurus/theme-live-codeblock'],
-  themeConfig: {
-    liveCodeBlock: {
-      /**
-       * The position of the live playground, above or under the editor
-       * Possible values: "top" | "bottom"
-       */
-      playgroundPosition: 'bottom',
-    },
-  },
-};
-```
+:::tip
+
+If you have installed `@docusaurus/preset-classic`, you don't need to install it as a dependency.
+
+:::
